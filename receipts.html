@@ -43,6 +43,13 @@ nav.top { position: sticky; top: 0; z-index: 50; background: var(--lfg-cream); b
 nav.top .wrap { height: 60px; display: flex; align-items: center; justify-content: space-between; }
 .wordmark { font-family: var(--font-display); font-weight: 700; font-size: 19px; letter-spacing: -0.02em; text-transform: lowercase; color: var(--lfg-black); text-decoration: none; line-height: 1; }
 .wordmark .tld { color: var(--lfg-orange); }
+.nav-right { display: flex; align-items: center; gap: clamp(16px, 3vw, 26px); }
+.nav-link {
+  font-family: var(--font-body); font-weight: 700; font-size: 14px;
+  color: rgba(0,0,0,0.65); text-decoration: underline;
+  text-decoration-color: var(--lfg-orange); text-underline-offset: 3px;
+}
+.nav-link:hover { color: var(--lfg-black); }
 .nav-motif { display: flex; flex-direction: column; gap: 3px; width: 76px; transition: opacity .2s var(--ease); }
 .nav-motif:hover { opacity: 0.72; }
 .nav-motif span { display: block; height: 4px; }
@@ -123,7 +130,10 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
   <nav class="top">
     <div class="wrap">
       <a class="wordmark" href="/">lostinthe<span class="tld">wind</span></a>
-      <a class="nav-motif" href="https://lookingforgrowth.uk" target="_blank" rel="noopener" aria-label="looking for growth — visit the main site"><span></span><span></span><span></span><span></span></a>
+      <div class="nav-right">
+        <a class="nav-link" href="/">the counter</a>
+        <a class="nav-motif" href="https://lookingforgrowth.uk" target="_blank" rel="noopener" aria-label="looking for growth — visit the main site"><span></span><span></span><span></span><span></span></a>
+      </div>
     </div>
   </nav>
 
