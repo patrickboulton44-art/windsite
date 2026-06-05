@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="en-GB"><head>
+<meta charset="utf-8">
+<title>the wasted wind counter — looking for growth</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Britain is paying wind farms to switch off — and paying gas to fill the gap. Watch the bill climb in real time.">
+<style>/* ============================================================
+   LFG — Looking For Growth — Design Tokens
+   Source of truth for colours, type and visual primitives.
+   ============================================================ */
+
+/* ---- Fonts ----
+   Display: Octarine (Atipo Foundry). Loaded locally from /fonts/octarine/.
+           Bold 700 + Light 300, each with their oblique italics.
+   Body:   DM Sans — Google Fonts.
+   Manrope kept loaded as a last-resort fallback (one-line fallback chain only).
+   -----------------------------------------------------------------*/
+/* latin-ext */
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/dm-sans-400.woff2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/dm-sans-400-2.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("fonts/dm-sans-400.woff2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("fonts/dm-sans-400-2.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("fonts/dm-sans-400.woff2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("fonts/dm-sans-400-2.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url("fonts/dm-sans-400.woff2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url("fonts/dm-sans-400-2.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("fonts/manrope-700.woff2") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("fonts/manrope-700-2.woff2") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("fonts/manrope-700-3.woff2") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("fonts/manrope-700-4.woff2") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("fonts/manrope-700-5.woff2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("fonts/manrope-700-6.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("fonts/manrope-700.woff2") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("fonts/manrope-700-2.woff2") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("fonts/manrope-700-3.woff2") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("fonts/manrope-700-4.woff2") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("fonts/manrope-700-5.woff2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("fonts/manrope-700-6.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+
+@font-face {
+  font-family: "Octarine";
+  src: url("fonts/octarine-300.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Octarine";
+  src: url("fonts/octarine-300-italic.otf") format("opentype");
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Octarine";
+  src: url("fonts/octarine-700.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Octarine";
+  src: url("fonts/octarine-700-italic.otf") format("opentype");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  /* ============ BRAND COLOURS ============ */
+  --lfg-black:       #000000;
+  --lfg-orange:      #EE9944;   /* Primary action colour */
+  --lfg-yellow:      #EE9944;   /* Warm orange / secondary accent */
+  --lfg-blue:        #79CAC4;   /* Teal / cool counterweight */
+  --lfg-cream:       #EBE3D0;   /* Warm off-white background */
+  --lfg-white:       #FFFFFF;
+
+  /* ============ SEMANTIC COLOURS ============ */
+  /* Surfaces */
+  --bg:              var(--lfg-cream);      /* default page background */
+  --bg-alt:          var(--lfg-white);      /* cards & light surfaces  */
+  --bg-invert:       var(--lfg-black);      /* dark sections, footers  */
+  --bg-accent:       var(--lfg-orange);     /* bold accent panels      */
+
+  /* Foreground / text */
+  --fg:              var(--lfg-black);
+  --fg-muted:        rgba(0, 0, 0, 0.60);
+  --fg-subtle:       rgba(0, 0, 0, 0.40);
+  --fg-on-dark:      var(--lfg-cream);
+  --fg-on-orange:    var(--lfg-black);      /* black holds on orange */
+
+  /* Borders & rules */
+  --rule:            var(--lfg-black);      /* hard 1px black line */
+  --rule-soft:       rgba(0, 0, 0, 0.12);
+
+  /* Underline accents (signature brand device) */
+  --accent-orange:   var(--lfg-orange);
+  --accent-teal:     var(--lfg-blue);
+
+  /* ============ TYPE FAMILIES ============ */
+  --font-display:    "Octarine", "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body:       "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono:       "DM Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Type weights — keep these named so swaps are explicit */
+  --w-light:    300;
+  --w-regular:  400;
+  --w-medium:   500;
+  --w-bold:     700;
+  --w-black:    900;
+
+  /* Octarine only ships in 300 + 700. When using --font-display, choose between:
+     - --w-display-light (300) for editorial / poster sub-heads
+     - --w-display-bold  (700) for the default display weight             */
+  --w-display-light: 300;
+  --w-display-bold:  700;
+
+  /* ============ TYPE SCALE (clamped, fluid) ============ */
+  /* Display sizes follow the brand's loud-hero / no-caps pattern */
+  --t-hero:     clamp(56px, 9vw, 144px);    /* posters & full-bleed heroes */
+  --t-display:  clamp(44px, 6vw, 88px);     /* section headlines */
+  --t-h1:       clamp(32px, 4vw, 56px);
+  --t-h2:       clamp(26px, 3vw, 40px);
+  --t-h3:       22px;
+  --t-h4:       18px;
+  --t-body:     16px;
+  --t-small:    14px;
+  --t-eyebrow:  12px;
+
+  --lh-tight:   1.02;
+  --lh-snug:    1.10;
+  --lh-normal:  1.45;
+  --lh-loose:   1.60;
+
+  --tracking-tight: -0.02em;
+  --tracking-eyebrow: 0.08em;
+
+  /* ============ SPACING (8px base) ============ */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+  --s-9: 96px;
+  --s-10: 128px;
+
+  /* ============ RADII ============ */
+  /* LFG is square-first. Pill is used on CTAs ("Download" chip in the bible). */
+  --r-none: 0;
+  --r-sm:   4px;
+  --r-md:   8px;
+  --r-pill: 999px;
+
+  /* ============ ELEVATION (used sparingly — brand is flat) ============ */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+  --shadow-hard: 4px 4px 0 var(--lfg-black);   /* signature offset block */
+
+  /* ============ MOTION ============ */
+  --ease:        cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-snap:   cubic-bezier(0.4, 0.0, 0.2, 1);
+  --dur-fast:    120ms;
+  --dur-base:    200ms;
+  --dur-slow:    400ms;
+}
+
+/* ============================================================
+   ELEMENT-LEVEL DEFAULTS
+   ============================================================ */
+html, body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: var(--t-body);
+  line-height: var(--lh-normal);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Display headlines — Manrope (Octarine substitute), lowercase, tight */
+.h-hero, .h-display, .h-1, .h-2 {
+  font-family: var(--font-display);
+  font-weight: 700;              /* Octarine Bold (only available weights are 300 / 700) */
+  text-transform: lowercase;
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--fg);
+  margin: 0;
+}
+.h-hero    { font-size: var(--t-hero); }
+.h-display { font-size: var(--t-display); }
+.h-1       { font-size: var(--t-h1); }
+.h-2       { font-size: var(--t-h2); }
+
+/* Sub-headlines — DM Sans Black, sentence case */
+.h-3, .h-4 {
+  font-family: var(--font-body);
+  font-weight: var(--w-black);
+  line-height: var(--lh-snug);
+  margin: 0;
+}
+.h-3 { font-size: var(--t-h3); }
+.h-4 { font-size: var(--t-h4); }
+
+/* Body */
+p, .p {
+  font-family: var(--font-body);
+  font-weight: var(--w-regular);
+  font-size: var(--t-body);
+  line-height: var(--lh-normal);
+  color: var(--fg);
+  text-wrap: pretty;
+  margin: 0;
+}
+.p-small  { font-size: var(--t-small); }
+.p-muted  { color: var(--fg-muted); }
+
+/* Eyebrow / label */
+.eyebrow {
+  font-family: var(--font-body);
+  font-weight: var(--w-bold);
+  font-size: var(--t-eyebrow);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+/* Signature underline accents — orange & teal under key phrases */
+.u-orange { text-decoration: underline; text-decoration-color: var(--accent-orange); text-decoration-thickness: 0.10em; text-underline-offset: 0.08em; }
+.u-teal   { text-decoration: underline; text-decoration-color: var(--accent-teal);   text-decoration-thickness: 0.10em; text-underline-offset: 0.08em; }
+
+/* Mono — fallback if needed */
+code, .mono {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+/* Hard 1px rule used across the brand bible to divide sections */
+.hr { border: 0; border-top: 1px solid var(--rule); height: 0; margin: var(--s-7) 0 var(--s-5); }
+</style>
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--fg); }
+  ::selection { background: var(--lfg-orange); color: #000; }
+
+  .wrap { width: 100%; max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  @media (min-width: 700px) { .wrap { padding: 0 40px; } }
+
+  /* ---------------- NAV ---------------- */
+  nav.top {
+    position: sticky; top: 0; z-index: 50;
+    background: var(--lfg-cream);
+    border-bottom: 1px solid var(--rule);
+  }
+  nav.top .wrap {
+    height: 60px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .wordmark {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: 19px; letter-spacing: -0.02em; text-transform: lowercase;
+    color: var(--fg); text-decoration: none; line-height: 1;
+  }
+  .wordmark .tld { color: var(--lfg-orange); }
+  .nav-motif { display: flex; flex-direction: column; gap: 3px; width: 76px; }
+  .nav-motif span { display: block; height: 4px; }
+  .nav-motif span:nth-child(1){ width: 72%; background: var(--lfg-yellow); }
+  .nav-motif span:nth-child(2){ width: 96%; background: var(--lfg-orange); }
+  .nav-motif span:nth-child(3){ width: 84%; background: var(--lfg-blue); }
+  .nav-motif span:nth-child(4){ width: 28%; background: var(--lfg-black); }
+
+  /* ---------------- HERO ---------------- */
+  section.hero {
+    background: var(--lfg-black); color: var(--lfg-cream);
+    padding: clamp(40px, 7vw, 88px) 0 clamp(48px, 8vw, 96px);
+    text-align: center;
+    position: relative;
+  }
+  .eyebrow-live {
+    display: inline-flex; align-items: center; gap: 9px;
+    font-family: var(--font-body); font-weight: 700;
+    font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--lfg-orange);
+  }
+  .dot-live {
+    width: 9px; height: 9px; border-radius: 50%; background: var(--lfg-orange);
+    box-shadow: 0 0 0 0 rgba(254,85,0,0.7);
+    animation: pulse 1.4s infinite var(--ease);
+  }
+  @keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(254,85,0,0.6); }
+    70%  { box-shadow: 0 0 0 11px rgba(254,85,0,0); }
+    100% { box-shadow: 0 0 0 0 rgba(254,85,0,0); }
+  }
+  .hero h1 {
+    font-family: var(--font-display); font-weight: 700;
+    text-transform: lowercase; letter-spacing: -0.025em;
+    line-height: 1.0;
+    font-size: clamp(30px, 6vw, 60px);
+    margin: 22px auto 0; max-width: 16ch; text-wrap: balance;
+  }
+  .hero h1 .u-orange { text-decoration-thickness: 0.07em; text-underline-offset: 0.02em; }
+  .hero h1 .u-teal   { text-decoration-thickness: 0.07em; text-underline-offset: 0.02em; }
+
+  /* ---- guessing game intro ---- */
+  html.locked, body.locked { overflow: hidden; }
+  /* on short screens, let the locked game scroll internally rather than clip */
+  body.locked section.game { height: 100svh; overflow-y: auto; }
+
+  /* button-triggered page transition: the game fades out, the rest fades on,
+     no scroll jump. */
+  section.game { transition: opacity 480ms ease; }
+  section.game.dismissed { opacity: 0; pointer-events: none; }
+  #mainContent { opacity: 0; }
+  #mainContent.shown { opacity: 1; transition: opacity 760ms ease; }
+  @media (prefers-reduced-motion: reduce) {
+    section.game, #mainContent.shown { transition: none; }
+  }
+  section.game {
+    position: relative; min-height: 100svh;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--lfg-cream); color: var(--lfg-black);
+    padding: clamp(84px, 13vh, 130px) 20px clamp(40px, 8vh, 80px);
+    overflow: hidden;
+  }
+  .game-bg {
+    position: absolute; inset: 0; background: var(--lfg-orange);
+    opacity: 0; transition: opacity 1600ms ease; pointer-events: none;
+  }
+  section.game.revealed .game-bg { opacity: 1; }
+  .game-inner { position: relative; width: min(100%, 880px); text-align: center; }
+
+  /* question */
+  .q-kicker {
+    font-family: var(--font-body); font-weight: 700; font-size: clamp(11px,1.5vw,13px);
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--lfg-orange);
+    margin: 0 0 18px;
+  }
+  .q-headline {
+    font-family: var(--font-display); font-weight: 700; text-transform: lowercase;
+    letter-spacing: -0.025em; line-height: 1.04;
+    font-size: clamp(26px, 4.3vw, 50px);
+    margin: 0 auto; max-width: 19ch; text-wrap: balance; color: var(--lfg-black);
+  }
+
+  /* number stepper */
+  .spinner {
+    margin: clamp(34px,6vh,56px) 0 0;
+    display: flex; flex-direction: column; align-items: center; gap: clamp(14px,2.5vh,22px);
+    user-select: none;
+  }
+  .sp-amount {
+    font-family: var(--font-display); font-weight: 700; letter-spacing: -0.025em;
+    font-size: clamp(56px, 13vw, 132px); line-height: 0.9; color: var(--lfg-black);
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  .sp-steppers { display: flex; flex-direction: row; gap: clamp(10px,1.6vw,14px); }
+  .sp-btn {
+    width: clamp(60px, 11vw, 78px); height: clamp(44px, 7vw, 56px);
+    display: flex; align-items: center; justify-content: center;
+    border: 2.5px solid var(--lfg-black); background: var(--lfg-cream);
+    color: var(--lfg-black); cursor: pointer; padding: 0;
+    font-family: var(--font-display); font-weight: 700; font-size: clamp(24px,3.4vw,32px); line-height: 1;
+    transition: background 140ms var(--ease,ease), color 140ms ease, transform 90ms ease;
+  }
+  .sp-btn:hover { background: var(--lfg-black); color: var(--lfg-orange); }
+  .sp-btn:active { transform: scale(0.93); }
+  .sp-hint {
+    margin: 24px 0 0; font-family: var(--font-body); font-weight: 500;
+    font-size: clamp(12px,1.6vw,14px); color: rgba(0,0,0,0.5); letter-spacing: 0.02em;
+  }
+  .game-note {
+    margin: clamp(30px, 5vh, 52px) 0 0;
+    font-family: var(--font-body); font-style: italic; font-weight: 500;
+    font-size: clamp(12px, 1.6vw, 14px); color: rgba(0,0,0,0.5);
+  }
+
+  .reveal-btn, .continue-btn {
+    margin-top: clamp(28px,5vh,44px);
+    display: inline-flex; align-items: center; gap: 11px;
+    font-family: var(--font-body); font-weight: 700; font-size: clamp(15px,2vw,18px);
+    background: var(--lfg-black); color: var(--lfg-cream);
+    border: 2px solid var(--lfg-black); padding: 16px 30px; cursor: pointer;
+    transition: background 200ms var(--ease,ease), color 200ms var(--ease,ease), transform 120ms ease;
+  }
+  .reveal-btn:hover, .continue-btn:hover { background: transparent; color: var(--lfg-black); }
+  .reveal-btn:active, .continue-btn:active { transform: translateY(2px); }
+
+  /* answer */
+  .answer { opacity: 0; }
+  section.game.answered .answer { opacity: 1; transition: opacity 700ms ease 150ms; }
+  @media (prefers-reduced-motion: reduce) {
+    .game-bg { transition: none; }
+    section.game.answered .answer { transition: none; }
+  }
+  .a-label {
+    font-family: var(--font-body); font-weight: 700; font-size: clamp(11px,1.6vw,14px);
+    letter-spacing: 0.14em; text-transform: uppercase; color: rgba(0,0,0,0.62); margin: 0;
+  }
+  .a-guess {
+    font-family: var(--font-display); font-weight: 700; letter-spacing: -0.02em;
+    font-size: clamp(32px,6.5vw,68px); line-height: 1; color: rgba(0,0,0,0.5);
+    margin: 8px 0 clamp(22px,4vh,34px);
+  }
+  .a-real {
+    font-family: var(--font-display); font-weight: 700; letter-spacing: -0.02em;
+    font-size: clamp(46px,12vw,128px); line-height: 0.88; color: var(--lfg-black);
+    margin-top: 8px; font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  .a-real .m-sym { margin-right: 0.03em; }
+  .a-sub {
+    margin: 16px 0 0; font-family: var(--font-body); font-weight: 500;
+    font-size: clamp(13px,1.7vw,16px); color: rgba(0,0,0,0.6);
+  }
+  .a-sub strong, .a-sub #meterRate { font-weight: 700; }
+  .verdict {
+    font-family: var(--font-display); font-weight: 700; text-transform: lowercase;
+    letter-spacing: -0.02em; line-height: 1.05;
+    font-size: clamp(22px,3.6vw,40px); color: var(--lfg-black);
+    margin: clamp(24px,4.5vh,38px) auto 0; max-width: 20ch; text-wrap: balance;
+  }
+
+  /* email capture on the answer screen (cream bg) */
+  .ask { margin: clamp(26px,4.5vh,40px) auto 0; max-width: 460px; }
+  .ask-line {
+    font-family: var(--font-body); font-weight: 500; font-size: clamp(15px,2vw,18px);
+    line-height: 1.45; color: rgba(0,0,0,0.72); margin: 0 0 16px; text-wrap: balance;
+  }
+  .ask-line strong { font-weight: 700; color: var(--lfg-black); }
+  .ask-row { display: flex; gap: 10px; }
+  .ask-row input {
+    flex: 1; min-width: 0; font: inherit; font-size: 16px;
+    background: var(--lfg-cream); color: var(--lfg-black);
+    border: 2px solid var(--lfg-black); padding: 14px 15px;
+  }
+  .ask-row input::placeholder { color: rgba(0,0,0,0.42); }
+  .ask-row input:focus { outline: none; border-color: var(--lfg-orange); }
+  .ask-row button {
+    flex-shrink: 0; cursor: pointer; font-family: var(--font-body); font-weight: 700; font-size: 16px;
+    background: var(--lfg-black); color: var(--lfg-cream); border: 2px solid var(--lfg-black);
+    padding: 14px 22px; transition: background .2s var(--ease,ease), color .2s var(--ease,ease);
+  }
+  .ask-row button:hover { background: var(--lfg-orange); border-color: var(--lfg-orange); color: var(--lfg-black); }
+  .ask-skip {
+    display: inline-block; margin-top: 16px; background: none; border: none; cursor: pointer;
+    font-family: var(--font-body); font-weight: 700; font-size: 13px; letter-spacing: 0.04em;
+    color: rgba(0,0,0,0.5); text-decoration: underline; text-underline-offset: 3px;
+  }
+  .ask-skip:hover { color: var(--lfg-black); }
+  .ask-done {
+    font-family: var(--font-display); font-weight: 700; text-transform: lowercase;
+    letter-spacing: -0.02em; font-size: clamp(22px,3.6vw,32px); line-height: 1.05; color: var(--lfg-black);
+  }
+  .ask-done span { color: var(--lfg-orange); }
+  .ask-sent { font-family: var(--font-body); font-weight: 500; font-size: 14px; color: rgba(0,0,0,0.6); margin: 10px 0 0; }
+  @media (max-width: 520px) { .ask-row { flex-direction: column; } }
+
+  /* counter */
+  .counter-label {
+    margin-top: clamp(34px, 5vw, 56px);
+    font-family: var(--font-body); font-weight: 700;
+    font-size: clamp(13px, 1.8vw, 16px); letter-spacing: 0.14em;
+    text-transform: uppercase; color: rgba(235,227,208,0.55);
+  }
+  .counter {
+    display: flex; align-items: flex-start; justify-content: center;
+    gap: 0.04em; margin-top: 10px; padding: 0 2px;
+    font-family: var(--font-display); font-weight: 700;
+    line-height: 0.86; letter-spacing: -0.01em;
+    color: var(--lfg-cream);
+    user-select: none;
+  }
+  .counter .sym { color: var(--lfg-orange); font-size: 0.62em; margin-top: 0.06em; }
+  .counter-digits { display: inline-flex; align-items: baseline; }
+  .counter .cell {
+    display: inline-block; width: 0.62em; text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+  .counter .sep { display: inline-block; width: 0.30em; text-align: center; }
+
+  .rates {
+    margin-top: clamp(20px, 3vw, 30px);
+    display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 8px 0;
+    font-family: var(--font-body); color: var(--lfg-cream);
+  }
+  .rate {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 0 clamp(16px, 4vw, 34px);
+    position: relative;
+  }
+  .rate + .rate::before {
+    content: ""; position: absolute; left: 0; top: 12%; height: 76%;
+    width: 1px; background: rgba(235,227,208,0.22);
+  }
+  .rate b {
+    font-family: var(--font-display); font-weight: 700; font-size: clamp(18px, 3vw, 26px);
+    letter-spacing: -0.01em;
+  }
+  .rate b .ps { color: var(--lfg-orange); }
+  .rate span {
+    font-size: 12px; font-weight: 500; letter-spacing: 0.10em; text-transform: uppercase;
+    color: rgba(235,227,208,0.55); margin-top: 3px;
+  }
+
+  /* counter section sits on the brand blue */
+  section.counter-hero {
+    background: var(--lfg-blue); color: var(--lfg-black);
+    min-height: 100svh;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .counter-hero .counter-label { color: rgba(0,0,0,0.55); }
+  .counter-hero .counter { color: var(--lfg-black); }
+  .counter-hero .counter .sym { color: var(--lfg-black); }
+  .counter-hero .rates { color: var(--lfg-black); }
+  .counter-hero .rate + .rate::before { background: rgba(0,0,0,0.22); }
+  .counter-hero .rate span { color: rgba(0,0,0,0.55); }
+  .counter-hero .rate b .ps { color: rgba(0,0,0,0.45); }
+
+  /* ---------------- EXPLAINER ---------------- */
+  section.explain { background: var(--bg); padding: clamp(56px, 9vw, 104px) 0; }
+  .kicker {
+    font-family: var(--font-body); font-weight: 700; font-size: 12px;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--lfg-orange);
+    margin-bottom: 18px;
+  }
+  .explain h2 {
+    font-family: var(--font-display); font-weight: 700; text-transform: lowercase;
+    letter-spacing: -0.025em; line-height: 1.0;
+    font-size: clamp(30px, 5.2vw, 54px); margin: 0; max-width: 18ch;
+  }
+  .lede {
+    margin-top: 28px; max-width: 60ch;
+    font-size: clamp(17px, 2.1vw, 20px); line-height: 1.55; color: var(--fg);
+  }
+  .lede p { margin: 0 0 18px; }
+  .lede p:last-child { margin-bottom: 0; }
+  .lede strong { font-weight: 700; }
+
+  /* breakdown */
+  .breakdown {
+    margin-top: clamp(40px, 6vw, 64px);
+    display: grid; grid-template-columns: 1fr; gap: 1px;
+    background: var(--rule); border: 1px solid var(--rule);
+  }
+  @media (min-width: 760px) { .breakdown { grid-template-columns: 1fr 1fr; } }
+  .stat { background: var(--lfg-white); padding: clamp(22px, 3vw, 32px); }
+  .stat.total { background: var(--lfg-black); color: var(--lfg-cream); }
+  .stat .num {
+    font-family: var(--font-display); font-weight: 700; letter-spacing: -0.02em;
+    font-size: clamp(40px, 6.5vw, 62px); line-height: 0.9; color: var(--lfg-black);
+  }
+  .stat.total .num { color: var(--lfg-cream); }
+  .stat.total .num em { color: var(--lfg-orange); font-style: normal; }
+  .stat .desc {
+    margin-top: 14px; font-family: var(--font-body); font-weight: 500;
+    font-size: 15px; line-height: 1.4; color: var(--fg-muted);
+  }
+  .stat.total .desc { color: rgba(235,227,208,0.7); }
+
+  /* warning */
+  .warning {
+    margin-top: clamp(40px, 6vw, 64px);
+    border-top: 1px solid var(--rule);
+    padding-top: clamp(32px, 5vw, 48px);
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .warning .pre {
+    font-family: var(--font-body); font-weight: 700; font-size: 13px;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg-muted);
+  }
+  .warning .big {
+    font-family: var(--font-display); font-weight: 700; text-transform: lowercase;
+    letter-spacing: -0.025em; line-height: 1.0;
+    font-size: clamp(30px, 5.4vw, 58px); max-width: 22ch;
+  }
+  .warning .big em { font-style: normal; color: var(--lfg-orange); }
+
+  /* ---- 3D cost-cliff chart ---- */
+  .cliff {
+    margin-top: clamp(44px, 7vw, 72px);
+    border-top: 1px solid var(--rule);
+    padding-top: clamp(34px, 5vw, 54px);
+  }
+  /* when the chart leads the section, drop the divider and add space below */
+  .cliff-lead {
+    margin-top: 0; border-top: 0; padding-top: 0;
+    margin-bottom: clamp(48px, 8vw, 84px);
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: clamp(44px, 7vw, 72px);
+  }
+  .cliff-head {
+    font-family: var(--font-display); font-weight: 700; text-transform: lowercase;
+    letter-spacing: -0.025em; line-height: 1.0;
+    font-size: clamp(30px, 5.4vw, 58px); max-width: 22ch; margin: 0;
+  }
+  .cliff-head em { font-style: normal; color: var(--lfg-orange); }
+
+  /* ---- big typographic "£8bn a year" hit ---- */
+  .bigtype {
+    font-family: var(--font-display); font-weight: 700; text-transform: lowercase;
+    line-height: 0.92; letter-spacing: -0.02em; color: var(--lfg-black);
+  }
+  .bigtype > span { display: block; }
+  .bt-l1 { font-size: clamp(28px, 6.5vw, 66px); }
+  .bigtype > span.bt-l2 {
+    display: flex; align-items: center; flex-wrap: wrap;
+    gap: clamp(12px, 3vw, 30px);
+    margin: clamp(6px, 1.6vw, 16px) 0 clamp(14px, 2.4vw, 26px);
+  }
+  .bt-amt {
+    font-size: clamp(86px, 24vw, 240px); line-height: 0.78; letter-spacing: -0.04em;
+    color: var(--lfg-orange);
+    text-shadow:
+      1px 1px 0 var(--lfg-black), 2px 2px 0 var(--lfg-black), 3px 3px 0 var(--lfg-black),
+      4px 4px 0 var(--lfg-black), 5px 5px 0 var(--lfg-black), 6px 6px 0 var(--lfg-black),
+      7px 7px 0 var(--lfg-black), 8px 8px 0 var(--lfg-black), 9px 9px 0 var(--lfg-black),
+      10px 10px 0 var(--lfg-black), 11px 11px 0 var(--lfg-black), 12px 12px 0 var(--lfg-black),
+      13px 13px 0 var(--lfg-black), 14px 14px 0 var(--lfg-black), 15px 15px 0 var(--lfg-black),
+      16px 16px 0 var(--lfg-black);
+  }
+  .bt-year {
+    align-self: flex-end; padding-bottom: clamp(10px, 2.6vw, 30px);
+    margin-left: clamp(20px, 4vw, 44px);
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(24px, 5.4vw, 52px); letter-spacing: -0.02em;
+    color: var(--lfg-black);
+  }
+  /* on narrow screens the £8bn is too big to share its line — stack "a year"
+     cleanly beneath it with enough clearance for the glyphs + 3D shadow */
+  @media (max-width: 620px) {
+    .bigtype > span.bt-l2 { flex-direction: column; align-items: flex-start; gap: 0; margin-bottom: clamp(16px, 3vw, 26px); }
+    .bt-amt { line-height: 1.0; }
+    .bt-year {
+      align-self: flex-start; margin-left: 0;
+      padding-bottom: 0; margin-top: clamp(18px, 5vw, 26px);
+      font-size: clamp(26px, 8vw, 44px);
+    }
+  }
+  .bt-l3 {
+    font-size: clamp(28px, 6.5vw, 66px);
+    display: inline-block;
+    border-bottom: clamp(4px, 0.7vw, 7px) solid var(--lfg-orange);
+    padding-bottom: 4px;
+  }
+  .chart-cap {
+    margin-top: clamp(30px, 5vw, 48px); max-width: 56ch;
+    font-family: var(--font-body); font-weight: 500; line-height: 1.5;
+    font-size: clamp(13px, 1.7vw, 15px); color: var(--fg-muted);
+  }
+
+  /* staggered reveal — keyframe animations (more reliable than transitions for
+     scroll-triggered reveals; the start state is held until .in is added).
+     The whole £8bn line (number + "a year") animates as ONE unit so "a year"
+     can never appear separately from the number beside it. */
+  @keyframes btFadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+  .bigtype .bt-l1, .bigtype .bt-l2, .bigtype .bt-l3,
+  .cliff-lead .chart-cap {
+    opacity: 0; transform: translateY(24px);
+  }
+  .bigtype.in .bt-l1   { animation: btFadeUp .6s ease 0s both; }
+  .bigtype.in .bt-l2   { animation: btFadeUp .7s ease .14s both; }
+  .bigtype.in .bt-l3   { animation: btFadeUp .6s ease .34s both; }
+  .bigtype.in ~ .chart-cap { animation: btFadeUp .55s ease .5s both; }
+  @media (prefers-reduced-motion: reduce) {
+    .bigtype .bt-l1, .bigtype .bt-l2, .bigtype .bt-l3,
+    .cliff-lead .chart-cap { opacity: 1; transform: none; animation: none; }
+  }
+
+  /* ---------------- CTA ---------------- */
+  section.cta { background: var(--lfg-orange); color: var(--lfg-black); padding: clamp(56px, 9vw, 100px) 0; }
+  .cta h2 {
+    font-family: var(--font-display); font-weight: 700; text-transform: lowercase;
+    letter-spacing: -0.03em; line-height: 0.96;
+    font-size: clamp(34px, 7vw, 76px); margin: 0; max-width: 16ch;
+  }
+  .cta .sub {
+    margin-top: 20px; max-width: 52ch;
+    font-size: clamp(16px, 2vw, 19px); line-height: 1.5; font-weight: 500;
+  }
+  .cta-actions {
+    margin-top: clamp(34px, 5vw, 48px);
+    display: grid; grid-template-columns: 1fr; gap: 14px; max-width: 560px;
+  }
+  .cta-btn {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    background: var(--lfg-black); color: var(--lfg-cream);
+    text-decoration: none; padding: 20px 24px;
+    border: 2px solid var(--lfg-black);
+    transition: background var(--dur-base) var(--ease), color var(--dur-base) var(--ease), transform var(--dur-fast) var(--ease);
+  }
+  .cta-btn .lab { font-family: var(--font-body); font-weight: 700; font-size: clamp(16px, 2.2vw, 19px); }
+  .cta-btn .sm { display: block; font-weight: 500; font-size: 13px; color: rgba(235,227,208,0.65); margin-top: 3px; }
+  .cta-btn .arrow { font-size: 22px; transition: transform var(--dur-base) var(--ease); flex-shrink: 0; }
+  .cta-btn:hover { background: var(--lfg-cream); color: var(--lfg-black); }
+  .cta-btn:hover .sm { color: var(--fg-muted); }
+  .cta-btn:hover .arrow { transform: translateX(5px); }
+  .cta-btn:active { transform: translate(2px, 2px); }
+
+  /* email signup */
+  .email-box {
+    margin-top: clamp(34px, 5vw, 48px); max-width: 560px;
+    background: var(--lfg-black); color: var(--lfg-cream);
+    padding: clamp(24px, 3.4vw, 34px);
+  }
+  .eb-head {
+    font-family: var(--font-display); font-weight: 700; text-transform: lowercase;
+    letter-spacing: -0.02em; font-size: clamp(22px, 3.4vw, 32px); line-height: 1.0;
+  }
+  .eb-sub { font-family: var(--font-body); font-weight: 500; font-size: 14px; color: rgba(235,227,208,0.66); margin-top: 8px; }
+  .eb-row { margin-top: 18px; display: flex; gap: 10px; }
+  .eb-row input {
+    flex: 1; min-width: 0; font: inherit; font-size: 16px;
+    background: var(--lfg-cream); color: var(--lfg-black);
+    border: 2px solid var(--lfg-cream); padding: 14px 15px;
+  }
+  .eb-row input::placeholder { color: rgba(0,0,0,0.42); }
+  .eb-row input:focus { outline: none; border-color: var(--lfg-orange); }
+  .eb-row button {
+    flex-shrink: 0; cursor: pointer; font-family: var(--font-body); font-weight: 700; font-size: 16px;
+    background: var(--lfg-orange); color: var(--lfg-black); border: 2px solid var(--lfg-orange);
+    padding: 14px 22px; transition: background .2s var(--ease), color .2s var(--ease);
+  }
+  .eb-row button:hover { background: var(--lfg-cream); border-color: var(--lfg-cream); }
+  .eb-done {
+    font-family: var(--font-display); font-weight: 700; text-transform: lowercase;
+    letter-spacing: -0.02em; font-size: clamp(22px, 3.4vw, 30px); line-height: 1.05;
+  }
+  .eb-done span { color: var(--lfg-orange); }
+  @media (max-width: 520px) { .eb-row { flex-direction: column; } }
+
+  /* ---------------- METHODOLOGY + FOOTER ---------------- */
+  footer.site { background: var(--lfg-black); color: var(--lfg-cream); }
+  .crest { display: flex; flex-direction: column; gap: 0; }
+  .crest span { display: block; height: 12px; width: 100%; }
+  .crest span:nth-child(1){ background: var(--lfg-yellow); }
+  .crest span:nth-child(2){ background: var(--lfg-orange); }
+  .crest span:nth-child(3){ background: var(--lfg-blue); }
+  .crest span:nth-child(4){ background: var(--lfg-black); height: 0; }
+
+  .method { padding: clamp(48px, 7vw, 76px) 0 clamp(32px, 4vw, 44px); }
+  .method .head {
+    font-family: var(--font-body); font-weight: 700; font-size: 12px;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--lfg-orange);
+    margin-bottom: 16px;
+  }
+  .method p {
+    max-width: 64ch; font-size: 14px; line-height: 1.6;
+    color: rgba(235,227,208,0.72); margin: 0 0 12px;
+  }
+  .method p a { color: var(--lfg-cream); text-decoration: underline; text-decoration-color: var(--lfg-orange); text-underline-offset: 2px; }
+
+  .foot-bottom {
+    border-top: 1px solid rgba(235,227,208,0.14);
+    padding: 26px 0 40px;
+    display: flex; flex-wrap: wrap; gap: 14px 32px;
+    align-items: flex-end; justify-content: space-between;
+  }
+  .foot-brand {
+    font-family: var(--font-display); font-weight: 700; text-transform: lowercase;
+    font-size: 26px; line-height: 0.92; letter-spacing: -0.03em; color: var(--lfg-cream);
+  }
+  .foot-brand .tld { font-size: 15px; color: var(--lfg-orange); }
+  .foot-note { font-family: var(--font-body); font-size: 12px; color: rgba(235,227,208,0.55); max-width: 48ch; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+  <nav class="top">
+    <div class="wrap">
+      <a class="wordmark" href="#">lookingforgrowth<span class="tld">.uk</span></a>
+      <div class="nav-motif" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+    </div>
+  </nav>
+
+  <!-- GUESSING GAME -->
+  <section class="game" id="game" data-screen-label="guess">
+    <div class="game-bg" id="gameBg" aria-hidden="true"></div>
+    <div class="game-inner">
+
+      <!-- question -->
+      <div class="quiz" id="quiz">
+        <p class="q-kicker">
+</p>
+        <h1 class="q-headline">how much has the government wasted turning off wind farms today?</h1>
+
+        <div class="spinner" id="spinner">
+          <span class="sp-amount" id="spAmount">£0</span>
+          <div class="sp-steppers">
+            <button class="sp-btn" id="spDown" type="button" aria-label="subtract £500">−</button>
+            <button class="sp-btn" id="spUp" type="button" aria-label="add £500">+</button>
+          </div>
+        </div>
+        <p class="sp-hint">your guess for today so far · £500 a tap, hold to move faster</p>
+
+        <button class="reveal-btn" id="revealBtn" type="button">lock in my guess<span aria-hidden="true">→</span></button>
+      </div>
+
+      <!-- answer -->
+      <div class="answer" id="answer" hidden="">
+        <p class="a-label">you guessed</p>
+        <div class="a-guess" id="aGuess">£0</div>
+        <p class="a-label">wasted today so far — and still climbing</p>
+        <div class="a-real"><span class="m-sym">£</span><span id="sinceAmt">0</span></div>
+        <p class="a-sub">and counting — <span id="meterRate">£47.56 a second</span></p>
+        <p class="verdict" id="verdict">not even close — we burns through cash faster than that.</p>
+
+        <form class="ask" id="emailForm">
+          <p class="ask-line">it climbs every second until we make them fix the grid. <strong>we're the campaign forcing it. join us.</strong></p>
+          <div class="ask-row">
+            <input type="email" id="emailInput" required="" placeholder="you@email.com" aria-label="Your email address">
+            <button type="submit">i'm in →</button>
+          </div>
+          <button class="ask-skip" id="continueBtn" type="button">Why is this happening?</button>
+        </form>
+      </div>
+
+      <p class="game-note"><em>based on last year's data.</em></p>
+
+    </div>
+  </section>
+
+  <div id="mainContent">
+  <!-- COUNTER -->
+  <section class="hero counter-hero" data-screen-label="counter">
+    <div class="wrap">
+      <div class="counter-label">WASTED SO FAR THIS TIME LAST YEAR</div>
+      <div class="counter" id="counter" aria-label="Money wasted so far this year, counting up live">
+        <span class="sym">£</span>
+        <span class="counter-digits" id="digits"></span>
+      </div>
+
+      <div class="rates">
+        <div class="rate"><b><span id="rSec">≈ £48</span><span class="ps"> /sec</span></b><span>every second</span></div>
+        <div class="rate"><b id="rMin">≈ £2,850</b><span>every minute</span></div>
+        <div class="rate"><b id="rHour">≈ £171,000</b><span>every hour</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPLAINER -->
+  <section class="explain" data-screen-label="explainer">
+    <div class="wrap">
+      <div class="cliff cliff-lead">
+        <div class="bigtype" id="costChart" role="img" aria-label="We're about to pay £8 billion a year to switch off the wind.">
+          <span class="bt-l1">we're about to pay</span>
+          <span class="bt-l2"><span class="bt-amt">£8bn</span><span class="bt-year">a year</span></span>
+          <span class="bt-l3">to switch off the wind.</span>
+        </div>
+        <p class="chart-cap">
+</p>
+      </div>
+
+      <div class="kicker">
+</div>
+      <h2>we pay wind farms to switch off because our grid is so weak.</h2>
+
+      <div class="lede">
+        <p>Wind farms can make more electricity than our creaking grid can carry. So we just… don't use it.</p>
+        <p>We pay the turbines to stop spinning — "constraint payments," they call it.. You pay for this.</p>
+        <p>Electricity — dumped in the bin. Not because we ran out of power. Because our planning system doesn't allow us to build the infrastructure we desperately need.</p>
+        <p>And it lands on your energy bill. Right now. Climbing every second you've been on this page.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta" data-screen-label="cta">
+    <div class="wrap">
+      <h2>this is fixable. build the grid.</h2>
+      <p class="sub">LFG is a movement for growth — and cheap power is growth. We pressure government to build the infrastructure. Join us.</p>
+
+      <form class="email-box" id="ctaEmailForm">
+        <div class="eb-head">join the mailing list</div>
+        <div class="eb-sub">campaign updates + first word on the pub socials. no spam, just the fight.</div>
+        <div class="eb-row">
+          <input type="email" id="ctaEmailInput" required="" placeholder="you@email.com" aria-label="Your email address">
+          <button type="submit">i'm in →</button>
+        </div>
+      </form>
+
+      <div class="cta-actions">
+        <a class="cta-btn" href="https://x.com/lookingforgrowth" target="_blank" rel="noopener">
+          <span class="lab">follow the movement<span class="sm">@lookingforgrowth on X</span></span>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="cta-btn" href="#">
+          <span class="lab">come to the pub<span class="sm">hear about our socials — first round's the argument</span></span>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- METHODOLOGY + FOOTER -->
+  <footer class="site">
+    <div class="crest" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+    <div class="wrap">
+      <div class="method">
+        <div class="head">how we worked this out</div>
+        <p></p>
+        <p>We spread the annual total evenly across the year — <strong>£47.56 a second</strong> — and accrue it from 00:00 on 1 January to drive this counter. The real cost is seasonal, higher in windy months, so treat this as an even-rate estimate, not a live meter. The cost is paid through energy bills, not by the taxpayer.</p>
+      </div>
+      <div class="foot-bottom">
+        <div class="foot-brand">looking<br>for<br>growth<span class="tld">.uk</span></div>
+        <div class="foot-note"></div>
+      </div>
+    </div>
+  </footer>
+  </div><!-- /#mainContent -->
+
+<script>
+window.LFG = window.LFG || {};
+(function () {
+  // Single source of truth for the per-second rate, shared by all counters.
+  // today  = £1.5bn / yr  → £47.56 a second
+  // 2030   = £8.0bn / yr  → ~£253.65 a second (if the grid isn't fixed)
+  LFG.scenarios = { 'today': 47.56, '2030': 47.56 * (8 / 1.5) };
+  LFG.rate = LFG.scenarios.today;
+  LFG.pennies = true;
+
+  function whole(n) { return '≈ £' + Math.round(n).toLocaleString('en-GB'); }
+  function persec(r) {
+    return '£' + r.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' a second';
+  }
+  LFG.applyRate = function () {
+    var r = LFG.rate;
+    var s = document.getElementById('rSec');
+    var mn = document.getElementById('rMin');
+    var hr = document.getElementById('rHour');
+    var ms = document.getElementById('meterRate');
+    if (s)  s.textContent  = whole(r);
+    if (mn) mn.textContent = whole(r * 60);
+    if (hr) hr.textContent = whole(r * 3600);
+    if (ms) ms.textContent = persec(r);
+  };
+  LFG.applyRate();
+})();
+</script>
+
+<script>
+(function () {
+  var now = new Date();
+  var yearStart = new Date(now.getFullYear(), 0, 1, 0, 0, 0, 0).getTime();
+
+  var counter = document.getElementById('counter');
+  var digits = document.getElementById('digits');
+  var cells = [];      // digit <span> elements, in order
+  var lastLen = -1;
+
+  function wasted() {
+    return ((Date.now() - yearStart) / 1000) * window.LFG.rate;
+  }
+
+  function fit() {
+    // widths are em-based, so the row's natural width scales linearly with
+    // font-size: one measure-and-scale pass fits exactly. We measure the
+    // inline-flex children's offsetWidth (their true content width) rather than
+    // counter.scrollWidth, which under-reports left overflow under justify-center.
+    var avail = counter.clientWidth - 4;
+    var MAX = 200, MIN = 30;
+    counter.style.fontSize = MAX + 'px';
+    var sym = counter.querySelector('.sym');
+    var w = digits.offsetWidth + (sym ? sym.offsetWidth : 0) + 8;
+    if (w <= 0) return;
+    var fs = MAX * (avail / w);
+    fs = Math.max(MIN, Math.min(MAX, fs));
+    counter.style.fontSize = fs + 'px';
+  }
+
+  function build(str) {
+    digits.innerHTML = '';
+    cells = [];
+    for (var i = 0; i < str.length; i++) {
+      var ch = str[i];
+      var el = document.createElement('span');
+      if (ch === ',') {
+        el.className = 'sep';
+        el.textContent = ',';
+      } else {
+        el.className = 'cell';
+        el.textContent = ch;
+        cells.push(el);
+      }
+      digits.appendChild(el);
+    }
+    lastLen = str.length;
+    fit();
+  }
+
+  function render() {
+    var str = Math.floor(wasted()).toLocaleString('en-GB');
+    if (str.length !== lastLen) {
+      build(str);
+    } else {
+      var di = 0;
+      for (var i = 0; i < str.length; i++) {
+        var ch = str[i];
+        if (ch !== ',') {
+          if (cells[di].textContent !== ch) cells[di].textContent = ch;
+          di++;
+        }
+      }
+    }
+    requestAnimationFrame(render);
+  }
+
+  var rt;
+  window.addEventListener('resize', function () {
+    clearTimeout(rt);
+    rt = setTimeout(fit, 120);
+  });
+
+  // Kick off once fonts are ready so the fit measurement uses Octarine metrics.
+  function start() { render(); }
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(function () { build(Math.floor(wasted()).toLocaleString('en-GB')); start(); });
+  } else {
+    build(Math.floor(wasted()).toLocaleString('en-GB'));
+    start();
+  }
+})();
+</script>
+
+<script>
+(function () {
+  // ---------- Guessing game ----------
+  // The answer is what's been wasted since the start of TODAY (local midnight),
+  // accruing at the per-second rate and still climbing live.
+  function dayStart() {
+    var n = new Date();
+    return new Date(n.getFullYear(), n.getMonth(), n.getDate(), 0, 0, 0, 0).getTime();
+  }
+  var loadT = dayStart();
+  function rate() { return (window.LFG && window.LFG.rate) ? window.LFG.rate : 47.56; }
+
+  // Live "since you opened" value — this IS the answer, and it keeps climbing.
+  var sinceEl = document.getElementById('sinceAmt');
+  function tick() {
+    if (sinceEl) {
+      var v = ((Date.now() - loadT) / 1000) * rate();
+      var dp = (window.LFG && window.LFG.pennies === false) ? 0 : 2;
+      sinceEl.textContent = v.toLocaleString('en-GB', { minimumFractionDigits: dp, maximumFractionDigits: dp });
+    }
+    requestAnimationFrame(tick);
+  }
+  tick();
+
+  // ---- stepper: single value, £1,000 a step, press-and-hold to accelerate ----
+  var guess = 0;
+  var STEP = 500, MAXG = 9999000;
+  var amountEl = document.getElementById('spAmount');
+  function renderGuess() { amountEl.textContent = '\u00a3' + guess.toLocaleString('en-GB'); }
+  function bump(dir) {
+    guess = Math.max(0, Math.min(MAXG, guess + dir * STEP));
+    renderGuess();
+  }
+  renderGuess();
+
+  function holdable(btn, dir) {
+    if (!btn) return;
+    var t1, t2;
+    function stop() { clearTimeout(t1); clearInterval(t2); }
+    function start(e) {
+      e.preventDefault();
+      bump(dir);
+      // after a short delay, repeat — ramping up hard so you can sweep into the
+      // millions in a few seconds (a daily total runs to ~£4m), while a single
+      // tap still nudges by exactly £100.
+      t1 = setTimeout(function () {
+        var n = 0;
+        t2 = setInterval(function () {
+          n++;
+          var mult = n > 38 ? 1000 : n > 26 ? 100 : n > 16 ? 20 : n > 7 ? 5 : 1;
+          bump(dir * mult);
+        }, 70);
+      }, 340);
+    }
+    btn.addEventListener('pointerdown', start);
+    btn.addEventListener('pointerup', stop);
+    btn.addEventListener('pointerleave', stop);
+    btn.addEventListener('pointercancel', stop);
+  }
+  holdable(document.getElementById('spUp'), 1);
+  holdable(document.getElementById('spDown'), -1);
+  function guessVal() { return guess; }
+
+  // ---- reveal ----
+  var game = document.getElementById('game');
+  var quiz = document.getElementById('quiz');
+  var answer = document.getElementById('answer');
+  var aGuess = document.getElementById('aGuess');
+  var verdictEl = document.getElementById('verdict');
+  var revealBtn = document.getElementById('revealBtn');
+
+  function verdict(guess, real) {
+    if (real <= 0) return 'the day\u2019s just begun \u2014 and it\u2019s already started.';
+    if (guess === 0) return 'zero? if only. it never stops.';
+    var fullDay = 86400 * rate(); // most they can burn in one day (~\u00a34.1m)
+    var r = guess / real;
+    // under the live figure
+    if (r < 0.5) return 'not even close \u2014 it burns through cash faster than that.';
+    if (r < 0.9) return 'you guessed low. it\u2019s already worse than that.';
+    if (r <= 1.1) return 'spot on \u2014 and that\u2019s the bleak part.';
+    // over the live figure, but the day will still climb past your guess
+    if (guess <= fullDay) return 'you went high \u2014 but it\u2019ll still climb past your guess before midnight.';
+    // over a whole day\u2019s worth of waste
+    return 'you\u2019ve overshot \u2014 even they can\u2019t waste that much in a single day.';
+  }
+
+  function reveal() {
+    var g = guessVal();
+    var real = Math.floor(((Date.now() - loadT) / 1000) * rate());
+    aGuess.textContent = '\u00a3' + g.toLocaleString('en-GB');
+    verdictEl.textContent = verdict(g, real);
+    quiz.setAttribute('hidden', '');
+    answer.removeAttribute('hidden');
+    game.classList.add('revealed', 'answered');
+    // stay locked — the user advances with the button, not by scrolling
+  }
+  if (revealBtn) revealBtn.addEventListener('click', reveal);
+
+  // ---- continue → fade the game out and fade the rest of the site on ----
+  var cont = document.getElementById('continueBtn');
+  var mainContent = document.getElementById('mainContent');
+  var advanced = false;
+  function advance() {
+    if (advanced) return;
+    advanced = true;
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    game.classList.add('dismissed');
+    var delay = reduce ? 0 : 460;
+    setTimeout(function () {
+      game.style.display = 'none';
+      window.scrollTo(0, 0);
+      // unlock so the now-visible content can be scrolled through
+      document.documentElement.classList.remove('locked');
+      document.body.classList.remove('locked');
+      if (mainContent) {
+        // force reflow so the opacity transition fires from its 0 baseline
+        void mainContent.offsetHeight;
+        mainContent.classList.add('shown');
+      }
+    }, delay);
+  }
+  if (cont) cont.addEventListener('click', advance);
+  // expose so the email signup can advance after a successful submit
+  window.LFG.advance = advance;
+
+  // Lock scrolling until the user commits to a guess.
+  document.documentElement.classList.add('locked');
+  document.body.classList.add('locked');
+})();
+</script>
+
+<script>
+(function () {
+  // 3D cost-cliff chart — bars rise when scrolled into view.
+  var chart = document.getElementById('costChart');
+  if (chart) {
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { chart.classList.add('in'); io.disconnect(); }
+        });
+      }, {
+        // negative top/bottom margins create a central trigger band, so the
+        // reveal only fires once the block is genuinely scrolled into view —
+        // not while it sits just below the fold during the page transition.
+        root: null, rootMargin: '-22% 0px -32% 0px', threshold: 0
+      });
+      io.observe(chart);
+    } else {
+      chart.classList.add('in');
+    }
+  }
+
+  // Email signup (on the answer screen) — thank-you, then offer the full story.
+  // Mailing-list signup in the CTA section.
+  var ctaForm = document.getElementById('ctaEmailForm');
+  if (ctaForm) {
+    ctaForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var email = (document.getElementById('ctaEmailInput') || {}).value || '';
+      var safe = email.replace(/[<>&]/g, '');
+      ctaForm.innerHTML =
+        '<div class="eb-done">you\u2019re in. <span>now go shout about it.</span></div>' +
+        '<div class="eb-sub" style="margin-top:10px">we\u2019ll be in touch at ' + safe + '. first word on the pub socials, too.</div>';
+    });
+  }
+
+  var form = document.getElementById('emailForm');
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var email = (document.getElementById('emailInput') || {}).value || '';
+      var safe = email.replace(/[<>&]/g, '');
+      form.innerHTML =
+        '<div class="ask-done">you\u2019re in. <span>now go shout about it.</span></div>' +
+        '<p class="ask-sent">we\u2019ll be in touch at ' + safe + '. first word on the pub socials, too.</p>' +
+        '<button class="ask-skip" type="button" id="afterEmailContinue">see why this is happening \u2193</button>';
+      var go = document.getElementById('afterEmailContinue');
+      if (go) go.addEventListener('click', function () {
+        if (window.LFG && window.LFG.advance) window.LFG.advance();
+      });
+    });
+  }
+})();
+</script>
+
+</body></html>
