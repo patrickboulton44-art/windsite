@@ -705,6 +705,9 @@ code, .mono {
   .counter-hero .rate + .rate::before { background: rgba(0,0,0,0.22); }
   .counter-hero .rate span { color: rgba(0,0,0,0.55); }
   .counter-hero .rate b .ps { color: rgba(0,0,0,0.45); }
+  .counter-receipts { margin-top: clamp(22px, 3.4vw, 32px); font-family: var(--font-body); font-weight: 700; font-size: 14px; }
+  .counter-receipts a { color: rgba(0,0,0,0.6); text-decoration: underline; text-decoration-color: var(--lfg-orange); text-underline-offset: 3px; }
+  .counter-receipts a:hover { color: var(--lfg-black); }
 
   /* ---------------- EXPLAINER ---------------- */
   section.explain { background: var(--bg); padding: clamp(56px, 9vw, 104px) 0; }
@@ -1100,6 +1103,7 @@ code, .mono {
         <div class="rate"><b id="rMin">≈ £2,850</b><span>every minute</span></div>
         <div class="rate"><b id="rHour">≈ £171,000</b><span>every hour</span></div>
       </div>
+      <p class="counter-receipts"><a href="/receipts.html">see the receipts — who was paid, when, how much →</a></p>
     </div>
   </section>
 
@@ -1166,7 +1170,7 @@ code, .mono {
       <div class="method">
         <div class="head">how we worked this out</div>
         <p></p>
-        <p>The numbers on this page come from <strong>Elexon</strong>, the official body that settles Britain's electricity market, via its free public data service. When the grid can't carry the wind, the system operator accepts paid "turn-down" offers from wind farms and buys replacement energy from other generators — we add up both costs, half-hour by half-hour, counting only turn-downs flagged as grid-constraint actions. Settled days update each morning; today's figure updates through the day, and the page re-checks the feed every 15 minutes. The "a second" rates shown are the recent average pace, for scale — the headline figures themselves are ledger values, not extrapolations. If the live feed is unavailable, the page falls back to an even-rate estimate based on ~£1.5bn a year (£47.56 a second). The cost is paid through energy bills, not by the taxpayer.</p>
+        <p>The numbers on this page come from <strong>Elexon</strong>, the official body that settles Britain's electricity market, via its free public data service. When the grid can't carry the wind, the system operator accepts paid "turn-down" offers from wind farms and buys replacement energy from other generators — we add up both costs, half-hour by half-hour, counting only turn-downs flagged as grid-constraint actions. Settled days update each morning; today's figure updates through the day, and the page re-checks the feed every 15 minutes. The "a second" rates shown are the recent average pace, for scale — the headline figures themselves are ledger values, not extrapolations. If the live feed is unavailable, the page falls back to an even-rate estimate based on ~£1.5bn a year (£47.56 a second). The cost is paid through energy bills, not by the taxpayer. <a class="method-link" href="/receipts.html">See the receipts for any day →</a></p>
       </div>
       <div class="foot-bottom">
         <div class="foot-brand">looking<br>for<br>growth<span class="tld">.uk</span></div>

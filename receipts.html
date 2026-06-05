@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en-GB"><head>
+<meta charset="utf-8">
+<title>the receipts — lost in the wind</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Every payment to switch a wind farm off, on the official record. Pick a day — who was paid, when, and how much.">
+<style>
+/* brand tokens — same values as the main page */
+:root {
+  --lfg-black:       #000000;
+  --lfg-orange:      #EE9944;
+  --lfg-orange-deep: #FE5500;
+  --lfg-yellow:      #EE9944;
+  --lfg-blue:        #79CAC4;
+  --lfg-cream:       #EBE3D0;
+  --rule: rgba(0,0,0,0.14);
+  --font-display: 'Octarine', 'DM Sans', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --ease: cubic-bezier(.25,.7,.3,1);
+}
+@font-face {
+  font-family: 'Octarine'; src: url("fonts/octarine-700.otf") format("opentype");
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'DM Sans'; src: url("fonts/dm-sans-400-2.woff2") format("woff2");
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'DM Sans'; src: url("fonts/dm-sans-400-2.woff2") format("woff2");
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'DM Sans'; src: url("fonts/dm-sans-400-2.woff2") format("woff2");
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--lfg-cream); }
+body { font-family: var(--font-body); color: var(--lfg-black); min-height: 100vh; }
+.wrap { max-width: 760px; margin: 0 auto; padding: 0 20px; }
+
+nav.top { position: sticky; top: 0; z-index: 50; background: var(--lfg-cream); border-bottom: 1px solid var(--rule); }
+nav.top .wrap { height: 60px; display: flex; align-items: center; justify-content: space-between; }
+.wordmark { font-family: var(--font-display); font-weight: 700; font-size: 19px; letter-spacing: -0.02em; text-transform: lowercase; color: var(--lfg-black); text-decoration: none; line-height: 1; }
+.wordmark .tld { color: var(--lfg-orange); }
+.nav-motif { display: flex; flex-direction: column; gap: 3px; width: 76px; transition: opacity .2s var(--ease); }
+.nav-motif:hover { opacity: 0.72; }
+.nav-motif span { display: block; height: 4px; }
+.nav-motif span:nth-child(1){ width: 72%; background: var(--lfg-yellow); }
+.nav-motif span:nth-child(2){ width: 96%; background: var(--lfg-orange-deep); }
+.nav-motif span:nth-child(3){ width: 84%; background: var(--lfg-blue); }
+.nav-motif span:nth-child(4){ width: 28%; background: var(--lfg-black); }
+
+main { padding: clamp(40px, 7vw, 72px) 0 80px; }
+h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowercase; letter-spacing: -0.02em; font-size: clamp(38px, 7vw, 64px); line-height: 1; }
+.lede { font-weight: 500; font-size: clamp(15px, 2vw, 17px); line-height: 1.5; color: rgba(0,0,0,0.72); margin-top: 14px; max-width: 52ch; }
+
+.day-nav { display: flex; align-items: center; gap: 10px; margin-top: clamp(26px, 4vw, 38px); }
+.day-nav button {
+  cursor: pointer; font-family: var(--font-body); font-weight: 700; font-size: 18px;
+  background: var(--lfg-black); color: var(--lfg-cream); border: 2px solid var(--lfg-black);
+  width: 46px; height: 46px; transition: background .2s var(--ease), color .2s var(--ease);
+}
+.day-nav button:hover:enabled { background: var(--lfg-orange); border-color: var(--lfg-orange); color: var(--lfg-black); }
+.day-nav button:disabled { opacity: 0.35; cursor: default; }
+.day-nav input {
+  font: inherit; font-weight: 700; font-size: 16px; height: 46px; padding: 0 12px;
+  background: var(--lfg-cream); color: var(--lfg-black); border: 2px solid var(--lfg-black);
+}
+.day-nav input:focus { outline: none; border-color: var(--lfg-orange); }
+
+#status { margin-top: 26px; font-weight: 700; color: rgba(0,0,0,0.55); }
+
+.summary { margin-top: clamp(26px, 4vw, 36px); }
+.sum-label { font-weight: 700; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(0,0,0,0.62); }
+.sum-amount { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.02em; font-size: clamp(44px, 10vw, 88px); line-height: 1; margin-top: 6px; }
+.sum-sub { font-weight: 500; font-size: 15px; color: rgba(0,0,0,0.65); margin-top: 12px; line-height: 1.55; max-width: 56ch; }
+.sum-sub strong { color: var(--lfg-black); }
+
+.farm {
+  margin-top: 14px; background: var(--lfg-black); color: var(--lfg-cream);
+  padding: clamp(18px, 3vw, 26px);
+}
+.farm:first-of-type { margin-top: clamp(26px, 4vw, 34px); }
+.farm-head { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.farm-name { font-family: var(--font-display); font-weight: 700; text-transform: lowercase; letter-spacing: -0.02em; font-size: clamp(20px, 3.4vw, 28px); line-height: 1.05; }
+.farm-cost { font-family: var(--font-display); font-weight: 700; font-size: clamp(20px, 3.4vw, 28px); color: var(--lfg-orange); white-space: nowrap; }
+.farm-detail { font-weight: 500; font-size: 14px; color: rgba(235,227,208,0.66); margin-top: 8px; line-height: 1.55; }
+
+.zero {
+  margin-top: clamp(26px, 4vw, 34px); border: 2px solid var(--lfg-black); padding: clamp(20px, 3.4vw, 30px);
+  font-family: var(--font-display); font-weight: 700; text-transform: lowercase; letter-spacing: -0.02em;
+  font-size: clamp(20px, 3.6vw, 30px); line-height: 1.15;
+}
+.zero span { color: var(--lfg-orange-deep); }
+
+.worst { margin-top: 26px; font-weight: 500; font-size: 14px; color: rgba(0,0,0,0.65); }
+.worst a { color: var(--lfg-black); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.worst a:hover { color: var(--lfg-orange-deep); }
+
+.check { margin-top: clamp(40px, 6vw, 56px); border-top: 1px solid var(--rule); padding-top: 22px; font-weight: 500; font-size: 13px; line-height: 1.65; color: rgba(0,0,0,0.6); max-width: 62ch; }
+.check a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.check a:hover { color: var(--lfg-black); }
+</style>
+</head>
+<body>
+
+  <nav class="top">
+    <div class="wrap">
+      <a class="wordmark" href="/">lostinthe<span class="tld">wind</span></a>
+      <a class="nav-motif" href="https://lookingforgrowth.uk" target="_blank" rel="noopener" aria-label="looking for growth — visit the main site"><span></span><span></span><span></span><span></span></a>
+    </div>
+  </nav>
+
+  <main>
+    <div class="wrap">
+      <h1>the receipts</h1>
+      <p class="lede">every time a wind farm is paid to switch off, it lands on the official record. pick a day — here's who was paid, when, and how much.</p>
+
+      <div class="day-nav">
+        <button id="prevBtn" type="button" aria-label="previous day">←</button>
+        <input type="date" id="dayPick" min="2026-01-01" aria-label="choose a day">
+        <button id="nextBtn" type="button" aria-label="next day">→</button>
+      </div>
+
+      <p id="status">loading the ledger…</p>
+      <div id="content"></div>
+      <p class="worst" id="worst" hidden></p>
+
+      <div class="check">
+        don't take our word for it: these figures are read live from
+        <a href="https://bmrs.elexon.co.uk" target="_blank" rel="noopener">Elexon</a>,
+        the official body that settles Britain's electricity market. the exact
+        records, the day-by-day table and the code that adds them up are all public in
+        <a href="https://github.com/patrickboulton44-art/windsite" target="_blank" rel="noopener">our repository</a>.
+        replacement-power costs are shown once a day fully settles.
+      </div>
+    </div>
+  </main>
+
+<script>
+(function () {
+  var pick = document.getElementById('dayPick');
+  var prev = document.getElementById('prevBtn');
+  var next = document.getElementById('nextBtn');
+  var statusEl = document.getElementById('status');
+  var content = document.getElementById('content');
+  var worstEl = document.getElementById('worst');
+
+  var today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/London' });
+  pick.max = today;
+
+  function gbp(n) {
+    return '£' + Math.round(n).toLocaleString('en-GB');
+  }
+  function prettyDate(iso) {
+    var d = new Date(iso + 'T12:00:00Z');
+    return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' }).toLowerCase();
+  }
+  function periodTime(p) {
+    var mins = (p - 1) * 30;
+    var h = Math.floor(mins / 60) % 24, m = mins % 60;
+    return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+  }
+  // merge consecutive half-hours into readable spells: "13:30–15:30"
+  function spells(periods) {
+    var out = [], start = null, last = null;
+    periods.forEach(function (p) {
+      if (start === null) { start = p; last = p; return; }
+      if (p === last + 1) { last = p; return; }
+      out.push(periodTime(start) + '–' + periodTime(last + 1));
+      start = p; last = p;
+    });
+    if (start !== null) out.push(periodTime(start) + '–' + periodTime(last + 1));
+    return out;
+  }
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined) n.textContent = text;
+    return n;
+  }
+
+  function render(d) {
+    content.textContent = '';
+    statusEl.hidden = true;
+
+    var sum = el('div', 'summary');
+    sum.appendChild(el('p', 'sum-label', prettyDate(d.date) + (d.isToday ? ' — so far today' : '')));
+
+    if (d.farmCount === 0) {
+      var z = el('div', 'zero');
+      z.appendChild(document.createTextNode('£0 — nothing wasted. the grid carried '));
+      z.appendChild(el('span', '', 'every megawatt'));
+      z.appendChild(document.createTextNode(' of wind this day. it can be done.'));
+      content.appendChild(sum);
+      content.appendChild(z);
+    } else {
+      sum.appendChild(el('div', 'sum-amount', gbp(d.switchOffCost)));
+      var subBits = 'paid to switch wind farms off — ' + d.paymentCount + ' payment' + (d.paymentCount === 1 ? '' : 's') +
+        ' to ' + d.farmCount + ' farm' + (d.farmCount === 1 ? '' : 's') + ', ' +
+        Math.round(d.curtailedMWh).toLocaleString('en-GB') + ' MWh thrown away.';
+      if (d.replaceCost !== null) {
+        subBits += ' replacing that energy cost another ' + gbp(d.replaceCost) + ' — day total ' + gbp(d.switchOffCost + d.replaceCost) + '.';
+      } else if (d.isToday) {
+        subBits += ' the replacement-power bill is tallied when the day settles.';
+      }
+      var sub = el('p', 'sum-sub');
+      sub.textContent = subBits;
+      sum.appendChild(sub);
+      content.appendChild(sum);
+
+      d.farms.forEach(function (f) {
+        var card = el('div', 'farm');
+        var head = el('div', 'farm-head');
+        head.appendChild(el('div', 'farm-name', f.name.toLowerCase()));
+        head.appendChild(el('div', 'farm-cost', gbp(f.cost)));
+        card.appendChild(head);
+        var sp = spells(f.periods);
+        card.appendChild(el('p', 'farm-detail',
+          'paid to stop ' + (sp.length > 1 ? 'during ' : 'between ') + sp.join(', ') +
+          ' — ' + Math.round(f.mwh).toLocaleString('en-GB') + ' MWh of clean power not made.'));
+        content.appendChild(card);
+      });
+    }
+
+    if (d.worstDay && d.worstDay.date !== d.date) {
+      worstEl.hidden = false;
+      worstEl.textContent = 'the worst day this year so far: ' + prettyDate(d.worstDay.date) + ' — ' + gbp(d.worstDay.total) + ' wasted. ';
+      var a = el('a', '', 'see that day →');
+      a.href = '?date=' + d.worstDay.date;
+      worstEl.appendChild(a);
+    } else {
+      worstEl.hidden = true;
+    }
+  }
+
+  var current = null;
+  function load(date) {
+    current = date;
+    pick.value = date;
+    prev.disabled = date <= '2026-01-01';
+    next.disabled = date >= today;
+    statusEl.hidden = false;
+    statusEl.textContent = 'reading the ledger…';
+    content.textContent = '';
+    worstEl.hidden = true;
+    history.replaceState(null, '', '?date=' + date);
+    fetch('/api/receipts?date=' + date).then(function (r) {
+      return r.ok ? r.json() : null;
+    }).then(function (d) {
+      if (current !== date) return; // a newer request superseded this one
+      if (!d || !d.farms) { statusEl.textContent = 'couldn’t reach the ledger — try again in a minute.'; return; }
+      render(d);
+    }).catch(function () {
+      if (current === date) statusEl.textContent = 'couldn’t reach the ledger — try again in a minute.';
+    });
+  }
+
+  function shift(days) {
+    var t = new Date(Date.parse(pick.value + 'T12:00:00Z') + days * 86400000).toISOString().slice(0, 10);
+    if (t < '2026-01-01' || t > today) return;
+    load(t);
+  }
+  prev.addEventListener('click', function () { shift(-1); });
+  next.addEventListener('click', function () { shift(1); });
+  pick.addEventListener('change', function () {
+    if (pick.value && pick.value >= '2026-01-01' && pick.value <= today) load(pick.value);
+  });
+
+  var q = new URLSearchParams(location.search).get('date');
+  load(q && /^\d{4}-\d{2}-\d{2}$/.test(q) && q >= '2026-01-01' && q <= today ? q : today);
+})();
+</script>
+
+</body></html>
