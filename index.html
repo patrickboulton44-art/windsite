@@ -1080,7 +1080,7 @@ code, .mono {
         </form>
       </div>
 
-      <p class="game-note"><em>based on last year's data.</em></p>
+      <p class="game-note"><em>live grid data from Elexon, the official record of Britain's electricity market.</em></p>
 
     </div>
   </section>
@@ -1089,7 +1089,7 @@ code, .mono {
   <!-- COUNTER -->
   <section class="hero counter-hero" data-screen-label="counter">
     <div class="wrap">
-      <div class="counter-label">WASTED SO FAR THIS TIME LAST YEAR</div>
+      <div class="counter-label">WASTED SO FAR THIS YEAR</div>
       <div class="counter" id="counter" aria-label="Money wasted so far this year, counting up live">
         <span class="sym">£</span>
         <span class="counter-digits" id="digits"></span>
@@ -1166,7 +1166,7 @@ code, .mono {
       <div class="method">
         <div class="head">how we worked this out</div>
         <p></p>
-        <p>We spread the annual total evenly across the year — <strong>£47.56 a second</strong> — and accrue it from 00:00 on 1 January to drive this counter. The real cost is seasonal, higher in windy months, so treat this as an even-rate estimate, not a live meter. The cost is paid through energy bills, not by the taxpayer.</p>
+        <p>The numbers on this page come from <strong>Elexon</strong>, the official body that settles Britain's electricity market, via its free public data service. When the grid can't carry the wind, the system operator accepts paid "turn-down" offers from wind farms and buys replacement energy from other generators — we add up both costs, half-hour by half-hour, counting only turn-downs flagged as grid-constraint actions. Settled days update each morning; today's figure updates through the day, ticking forward at the recent observed pace between updates. If the live feed is unavailable, the page falls back to an even-rate estimate based on ~£1.5bn a year (£47.56 a second). The cost is paid through energy bills, not by the taxpayer.</p>
       </div>
       <div class="foot-bottom">
         <div class="foot-brand">looking<br>for<br>growth<span class="tld">.uk</span></div>
@@ -1202,6 +1202,25 @@ window.LFG = window.LFG || {};
     if (ms) ms.textContent = persec(r);
   };
   LFG.applyRate();
+
+  // Real totals from Elexon via /api/wasted. Until (or unless) they arrive,
+  // everything falls back to the flat-rate estimate above.
+  LFG.real = null;
+  LFG.weekWasted = function (flatStartMs) {
+    if (LFG.real) return LFG.real.week + ((Date.now() - LFG.real.at) / 1000) * LFG.real.rate;
+    return ((Date.now() - flatStartMs) / 1000) * LFG.rate;
+  };
+  LFG.yearWasted = function (flatStartMs) {
+    if (LFG.real) return LFG.real.year + ((Date.now() - LFG.real.at) / 1000) * LFG.real.rate;
+    return ((Date.now() - flatStartMs) / 1000) * LFG.rate;
+  };
+  fetch('/api/wasted').then(function (r) {
+    return r.ok ? r.json() : null;
+  }).then(function (d) {
+    if (!d || !d.week || !(d.week.total >= 0) || !(d.year.total >= 0)) return;
+    LFG.real = { week: d.week.total, year: d.year.total, rate: d.ratePerSec || 0, at: Date.now() };
+    if (d.ratePerSec > 0) { LFG.rate = d.ratePerSec; LFG.applyRate(); }
+  }).catch(function () { /* keep the flat-rate fallback */ });
 })();
 </script>
 
@@ -1216,7 +1235,7 @@ window.LFG = window.LFG || {};
   var lastLen = -1;
 
   function wasted() {
-    return ((Date.now() - yearStart) / 1000) * window.LFG.rate;
+    return window.LFG.yearWasted(yearStart);
   }
 
   function fit() {
@@ -1307,7 +1326,7 @@ window.LFG = window.LFG || {};
   var sinceEl = document.getElementById('sinceAmt');
   function tick() {
     if (sinceEl) {
-      var v = ((Date.now() - loadT) / 1000) * rate();
+      var v = window.LFG.weekWasted(loadT);
       var dp = (window.LFG && window.LFG.pennies === false) ? 0 : 2;
       sinceEl.textContent = v.toLocaleString('en-GB', { minimumFractionDigits: dp, maximumFractionDigits: dp });
     }
@@ -1365,7 +1384,7 @@ window.LFG = window.LFG || {};
   function verdict(guess, real) {
     if (real <= 0) return 'the week\u2019s just begun \u2014 and it\u2019s already started.';
     if (guess === 0) return 'zero? if only. it never stops.';
-    var fullWeek = 604800 * rate(); // most they can burn in one week (~\u00a328.8m)
+    var fullWeek = 604800 * 47.56; // plausibility ceiling for one week (~\u00a328.8m at the annual average rate)
     var r = guess / real;
     // under the live figure
     if (r < 0.5) return 'not even close \u2014 it burns through cash faster than that.';
@@ -1379,7 +1398,7 @@ window.LFG = window.LFG || {};
 
   function reveal() {
     var g = guessVal();
-    var real = Math.floor(((Date.now() - loadT) / 1000) * rate());
+    var real = Math.floor(window.LFG.weekWasted(loadT));
     aGuess.textContent = '\u00a3' + g.toLocaleString('en-GB');
     verdictEl.textContent = verdict(g, real);
     quiz.setAttribute('hidden', '');

@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/wasted.js": {
+      "maxDuration": 60
+    }
+  }
+}
