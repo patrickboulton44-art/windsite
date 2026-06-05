@@ -74,6 +74,8 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
 .summary { margin-top: clamp(26px, 4vw, 36px); }
 .sum-label { font-weight: 700; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(0,0,0,0.62); }
 .sum-amount { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.02em; font-size: clamp(44px, 10vw, 88px); line-height: 1; margin-top: 6px; }
+.sum-amount a { color: inherit; text-decoration: none; border-bottom: 4px solid var(--lfg-orange); transition: border-color .2s var(--ease), color .2s var(--ease); }
+.sum-amount a:hover { color: var(--lfg-orange-deep); border-color: var(--lfg-orange-deep); }
 .sum-sub { font-weight: 500; font-size: 15px; color: rgba(0,0,0,0.65); margin-top: 12px; line-height: 1.55; max-width: 56ch; }
 .sum-sub strong { color: var(--lfg-black); }
 
@@ -85,7 +87,12 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
 .farm-head { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; flex-wrap: wrap; }
 .farm-name { font-family: var(--font-display); font-weight: 700; text-transform: lowercase; letter-spacing: -0.02em; font-size: clamp(20px, 3.4vw, 28px); line-height: 1.05; }
 .farm-cost { font-family: var(--font-display); font-weight: 700; font-size: clamp(20px, 3.4vw, 28px); color: var(--lfg-orange); white-space: nowrap; }
+.farm-cost a { color: inherit; text-decoration: none; border-bottom: 3px solid rgba(238,153,68,0.45); transition: border-color .2s var(--ease), color .2s var(--ease); }
+.farm-cost a:hover { color: var(--lfg-cream); border-color: var(--lfg-cream); }
 .farm-detail { font-weight: 500; font-size: 14px; color: rgba(235,227,208,0.66); margin-top: 8px; line-height: 1.55; }
+.farm-verify { font-weight: 500; font-size: 12px; color: rgba(235,227,208,0.45); margin-top: 10px; }
+.farm-verify a { color: rgba(235,227,208,0.66); text-decoration: underline; text-decoration-color: var(--lfg-orange); text-underline-offset: 2px; }
+.farm-verify a:hover { color: var(--lfg-cream); }
 
 .zero {
   margin-top: clamp(26px, 4vw, 34px); border: 2px solid var(--lfg-black); padding: clamp(20px, 3.4vw, 30px);
@@ -196,7 +203,14 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
       content.appendChild(sum);
       content.appendChild(z);
     } else {
-      sum.appendChild(el('div', 'sum-amount', gbp(d.switchOffCost)));
+      // the headline amount links to the raw data behind it
+      var amountWrap = el('div', 'sum-amount');
+      var amountLink = el('a', '', gbp(d.switchOffCost));
+      amountLink.href = '/api/receipts?date=' + d.date;
+      amountLink.target = '_blank'; amountLink.rel = 'noopener';
+      amountLink.title = 'open the raw data behind this number';
+      amountWrap.appendChild(amountLink);
+      sum.appendChild(amountWrap);
       var subBits = 'paid to switch wind farms off — ' + d.paymentCount + ' payment' + (d.paymentCount === 1 ? '' : 's') +
         ' to ' + d.farmCount + ' farm' + (d.farmCount === 1 ? '' : 's') + ', ' +
         Math.round(d.curtailedMWh).toLocaleString('en-GB') + ' MWh thrown away.';
@@ -214,12 +228,29 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
         var card = el('div', 'farm');
         var head = el('div', 'farm-head');
         head.appendChild(el('div', 'farm-name', f.name.toLowerCase()));
-        head.appendChild(el('div', 'farm-cost', gbp(f.cost)));
+        // the amount links straight to the official ledger page it came from
+        var costWrap = el('div', 'farm-cost');
+        var costLink = el('a', '', gbp(f.cost));
+        costLink.href = 'https://data.elexon.co.uk/bmrs/api/v1/balancing/settlement/stack/all/bid/' + d.date + '/' + f.periods[0];
+        costLink.target = '_blank'; costLink.rel = 'noopener';
+        costLink.title = 'open the official Elexon record for this farm’s first half-hour';
+        costWrap.appendChild(costLink);
+        head.appendChild(costWrap);
         card.appendChild(head);
         var sp = spells(f.periods);
         card.appendChild(el('p', 'farm-detail',
           'paid to stop ' + (sp.length > 1 ? 'during ' : 'between ') + sp.join(', ') +
           ' — ' + Math.round(f.mwh).toLocaleString('en-GB') + ' MWh of clean power not made.'));
+        // direct line to the official ledger entry for this farm's first
+        // half-hour of the day — search the grid code on that page to see
+        // the raw record behind this card
+        var verify = el('p', 'farm-verify');
+        verify.appendChild(document.createTextNode('grid code ' + f.units.join(', ') + ' — '));
+        var va = el('a', '', 'check the official record for ' + periodTime(f.periods[0]) + ' →');
+        va.href = 'https://data.elexon.co.uk/bmrs/api/v1/balancing/settlement/stack/all/bid/' + d.date + '/' + f.periods[0];
+        va.target = '_blank'; va.rel = 'noopener';
+        verify.appendChild(va);
+        card.appendChild(verify);
         content.appendChild(card);
       });
     }
