@@ -427,7 +427,8 @@ code, .mono {
     color: var(--fg); text-decoration: none; line-height: 1;
   }
   .wordmark .tld { color: var(--lfg-orange); }
-  .nav-motif { display: flex; flex-direction: column; gap: 3px; width: 76px; }
+  .nav-motif { display: flex; flex-direction: column; gap: 3px; width: 76px; transition: opacity .2s var(--ease, ease); }
+  .nav-motif:hover { opacity: 0.72; }
   .nav-motif span { display: block; height: 4px; }
   .nav-motif span:nth-child(1){ width: 72%; background: var(--lfg-yellow); }
   .nav-motif span:nth-child(2){ width: 96%; background: var(--lfg-orange); }
@@ -943,8 +944,8 @@ code, .mono {
 
   <nav class="top">
     <div class="wrap">
-      <a class="wordmark" href="#">lookingforgrowth<span class="tld">.uk</span></a>
-      <div class="nav-motif" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+      <a class="wordmark" href="#">lostinthe<span class="tld">wind</span></a>
+      <a class="nav-motif" href="https://lookingforgrowth.uk" target="_blank" rel="noopener" aria-label="looking for growth — visit the main site"><span></span><span></span><span></span><span></span></a>
     </div>
   </nav>
 
