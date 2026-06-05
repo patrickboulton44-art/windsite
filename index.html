@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <title>the wasted wind counter — looking for growth</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Britain is paying wind farms to switch off — and paying gas to fill the gap. Watch the bill climb in real time.">
+<meta name="description" content="Britain is paying wind farms to switch off — and paying gas to fill the gap. See the live bill, straight from the grid's official ledger.">
 <style>/* ============================================================
    LFG — Looking For Growth — Design Tokens
    Source of truth for colours, type and visual primitives.
@@ -1064,13 +1064,13 @@ code, .mono {
       <div class="answer" id="answer" hidden="">
         <p class="a-label">you guessed</p>
         <div class="a-guess" id="aGuess">£0</div>
-        <p class="a-label">wasted this week so far — and still climbing</p>
+        <p class="a-label">wasted this week so far — straight from the grid's ledger</p>
         <div class="a-real"><span class="m-sym">£</span><span id="sinceAmt">0</span></div>
-        <p class="a-sub">and counting — <span id="meterRate">£47.56 a second</span></p>
+        <p class="a-sub">recent pace: <span id="meterRate">£47.56 a second</span> · updates every 15 minutes</p>
         <p class="verdict" id="verdict">not even close — we burns through cash faster than that.</p>
 
         <form class="ask" id="emailForm">
-          <p class="ask-line">it climbs every second until we make them fix the grid. <strong>we're the campaign forcing it. join us.</strong></p>
+          <p class="ask-line">the bill keeps climbing until we make them fix the grid. <strong>we're the campaign forcing it. join us.</strong></p>
           <div class="ask-row">
             <input type="email" id="emailInput" required="" placeholder="you@email.com" aria-label="Your email address">
             <button type="submit">i'm in <span class="go" aria-hidden="true">→</span></button>
@@ -1090,7 +1090,7 @@ code, .mono {
   <section class="hero counter-hero" data-screen-label="counter">
     <div class="wrap">
       <div class="counter-label">WASTED SO FAR THIS YEAR</div>
-      <div class="counter" id="counter" aria-label="Money wasted so far this year, counting up live">
+      <div class="counter" id="counter" aria-label="Money wasted so far this year, from the official grid ledger">
         <span class="sym">£</span>
         <span class="counter-digits" id="digits"></span>
       </div>
@@ -1166,7 +1166,7 @@ code, .mono {
       <div class="method">
         <div class="head">how we worked this out</div>
         <p></p>
-        <p>The numbers on this page come from <strong>Elexon</strong>, the official body that settles Britain's electricity market, via its free public data service. When the grid can't carry the wind, the system operator accepts paid "turn-down" offers from wind farms and buys replacement energy from other generators — we add up both costs, half-hour by half-hour, counting only turn-downs flagged as grid-constraint actions. Settled days update each morning; today's figure updates through the day, ticking forward at the recent observed pace between updates. If the live feed is unavailable, the page falls back to an even-rate estimate based on ~£1.5bn a year (£47.56 a second). The cost is paid through energy bills, not by the taxpayer.</p>
+        <p>The numbers on this page come from <strong>Elexon</strong>, the official body that settles Britain's electricity market, via its free public data service. When the grid can't carry the wind, the system operator accepts paid "turn-down" offers from wind farms and buys replacement energy from other generators — we add up both costs, half-hour by half-hour, counting only turn-downs flagged as grid-constraint actions. Settled days update each morning; today's figure updates through the day, and the page re-checks the feed every 15 minutes. The "a second" rates shown are the recent average pace, for scale — the headline figures themselves are ledger values, not extrapolations. If the live feed is unavailable, the page falls back to an even-rate estimate based on ~£1.5bn a year (£47.56 a second). The cost is paid through energy bills, not by the taxpayer.</p>
       </div>
       <div class="foot-bottom">
         <div class="foot-brand">looking<br>for<br>growth<span class="tld">.uk</span></div>
@@ -1203,24 +1203,31 @@ window.LFG = window.LFG || {};
   };
   LFG.applyRate();
 
-  // Real totals from Elexon via /api/wasted. Until (or unless) they arrive,
-  // everything falls back to the flat-rate estimate above.
+  // Real totals from Elexon via /api/wasted. The displayed numbers are pure
+  // ledger values — no per-second extrapolation. The page re-checks the feed
+  // every 15 minutes so long-open tabs stay current. Until (or unless) real
+  // data arrives, the flat-rate estimate (frozen at page load) is the fallback.
   LFG.real = null;
+  var loadedAt = Date.now();
   LFG.weekWasted = function (flatStartMs) {
-    if (LFG.real) return LFG.real.week + ((Date.now() - LFG.real.at) / 1000) * LFG.real.rate;
-    return ((Date.now() - flatStartMs) / 1000) * LFG.rate;
+    if (LFG.real) return LFG.real.week;
+    return ((loadedAt - flatStartMs) / 1000) * LFG.rate;
   };
   LFG.yearWasted = function (flatStartMs) {
-    if (LFG.real) return LFG.real.year + ((Date.now() - LFG.real.at) / 1000) * LFG.real.rate;
-    return ((Date.now() - flatStartMs) / 1000) * LFG.rate;
+    if (LFG.real) return LFG.real.year;
+    return ((loadedAt - flatStartMs) / 1000) * LFG.rate;
   };
-  fetch('/api/wasted').then(function (r) {
-    return r.ok ? r.json() : null;
-  }).then(function (d) {
-    if (!d || !d.week || !(d.week.total >= 0) || !(d.year.total >= 0)) return;
-    LFG.real = { week: d.week.total, year: d.year.total, rate: d.ratePerSec || 0, at: Date.now() };
-    if (d.ratePerSec > 0) { LFG.rate = d.ratePerSec; LFG.applyRate(); }
-  }).catch(function () { /* keep the flat-rate fallback */ });
+  function syncReal() {
+    fetch('/api/wasted').then(function (r) {
+      return r.ok ? r.json() : null;
+    }).then(function (d) {
+      if (!d || !d.week || !(d.week.total >= 0) || !(d.year.total >= 0)) return;
+      LFG.real = { week: d.week.total, year: d.year.total, rate: d.ratePerSec || 0 };
+      if (d.ratePerSec > 0) { LFG.rate = d.ratePerSec; LFG.applyRate(); }
+    }).catch(function () { /* keep whatever we last had */ });
+  }
+  syncReal();
+  setInterval(syncReal, 15 * 60 * 1000);
 })();
 </script>
 
@@ -1322,7 +1329,8 @@ window.LFG = window.LFG || {};
   var loadT = weekStart();
   function rate() { return (window.LFG && window.LFG.rate) ? window.LFG.rate : 47.56; }
 
-  // Live "since you opened" value — this IS the answer, and it keeps climbing.
+  // The week-so-far ledger value — this IS the answer. It re-renders each
+  // frame so the 15-minute feed re-syncs show up without extra wiring.
   var sinceEl = document.getElementById('sinceAmt');
   function tick() {
     if (sinceEl) {
