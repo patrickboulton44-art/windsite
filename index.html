@@ -629,6 +629,19 @@ code, .mono {
   .ask-privacy { font-family: var(--font-body); font-weight: 500; font-size: 12px; color: rgba(0,0,0,0.5); margin: 10px 0 0; }
   .ask-privacy a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
   .ask-privacy a:hover { color: var(--lfg-black); }
+  /* the arrow on "i'm in" wiggles side to side */
+  .ask-row button .go, .eb-row button .go {
+    display: inline-block;
+    animation: go-wiggle 1.5s ease-in-out infinite;
+  }
+  @keyframes go-wiggle {
+    0%, 100% { transform: translateX(0); }
+    30% { transform: translateX(-3px); }
+    65% { transform: translateX(4px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ask-row button .go, .eb-row button .go { animation: none; }
+  }
   @media (max-width: 520px) { .ask-row { flex-direction: column; } }
 
   /* counter */
@@ -1060,7 +1073,7 @@ code, .mono {
           <p class="ask-line">it climbs every second until we make them fix the grid. <strong>we're the campaign forcing it. join us.</strong></p>
           <div class="ask-row">
             <input type="email" id="emailInput" required="" placeholder="you@email.com" aria-label="Your email address">
-            <button type="submit">i'm in →</button>
+            <button type="submit">i'm in <span class="go" aria-hidden="true">→</span></button>
           </div>
           <p class="ask-privacy">campaign updates only — see our <a href="https://lookingforgrowth.uk/privacy-policy/" target="_blank" rel="noopener">privacy policy</a>.</p>
           <button class="ask-skip" id="continueBtn" type="button">Why is this happening?</button>
@@ -1128,7 +1141,7 @@ code, .mono {
         <div class="eb-sub">campaign updates + first word on the pub socials. no spam, just the fight.</div>
         <div class="eb-row">
           <input type="email" id="ctaEmailInput" required="" placeholder="you@email.com" aria-label="Your email address">
-          <button type="submit">i'm in →</button>
+          <button type="submit">i'm in <span class="go" aria-hidden="true">→</span></button>
         </div>
         <div class="eb-privacy">campaign updates only — see our <a href="https://lookingforgrowth.uk/privacy-policy/" target="_blank" rel="noopener">privacy policy</a>.</div>
       </form>
@@ -1448,7 +1461,8 @@ window.LFG = window.LFG || {};
       e.preventDefault();
       var email = (input.value || '').trim();
       var btn = form.querySelector('button[type="submit"]');
-      var label = btn ? btn.textContent : '';
+      // keep the button's markup (the animated arrow), not just its text
+      var label = btn ? btn.innerHTML : '';
       var oldErr = form.querySelector('.' + errClass);
       if (oldErr) oldErr.remove();
       if (btn) { btn.disabled = true; btn.textContent = 'sending…'; }
