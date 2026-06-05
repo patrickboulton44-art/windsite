@@ -618,6 +618,11 @@ code, .mono {
   }
   .ask-done span { color: var(--lfg-orange); }
   .ask-sent { font-family: var(--font-body); font-weight: 500; font-size: 14px; color: rgba(0,0,0,0.6); margin: 10px 0 0; }
+  .ask-err { font-family: var(--font-body); font-weight: 700; font-size: 13px; color: #b3400f; margin: 10px 0 0; }
+  .ask-row button:disabled { opacity: 0.55; cursor: wait; background: var(--lfg-black); border-color: var(--lfg-black); color: var(--lfg-cream); }
+  .ask-privacy { font-family: var(--font-body); font-weight: 500; font-size: 12px; color: rgba(0,0,0,0.5); margin: 10px 0 0; }
+  .ask-privacy a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+  .ask-privacy a:hover { color: var(--lfg-black); }
   @media (max-width: 520px) { .ask-row { flex-direction: column; } }
 
   /* counter */
@@ -892,6 +897,11 @@ code, .mono {
     letter-spacing: -0.02em; font-size: clamp(22px, 3.4vw, 30px); line-height: 1.05;
   }
   .eb-done span { color: var(--lfg-orange); }
+  .eb-err { font-family: var(--font-body); font-weight: 700; font-size: 13px; color: var(--lfg-orange); margin-top: 10px; }
+  .eb-row button:disabled { opacity: 0.55; cursor: wait; background: var(--lfg-orange); border-color: var(--lfg-orange); color: var(--lfg-black); }
+  .eb-privacy { font-family: var(--font-body); font-weight: 500; font-size: 12px; color: rgba(235,227,208,0.55); margin-top: 10px; }
+  .eb-privacy a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+  .eb-privacy a:hover { color: var(--lfg-cream); }
   @media (max-width: 520px) { .eb-row { flex-direction: column; } }
 
   /* ---------------- METHODOLOGY + FOOTER ---------------- */
@@ -976,6 +986,7 @@ code, .mono {
             <input type="email" id="emailInput" required="" placeholder="you@email.com" aria-label="Your email address">
             <button type="submit">i'm in →</button>
           </div>
+          <p class="ask-privacy">campaign updates only — see our <a href="https://lookingforgrowth.uk/privacy-policy/" target="_blank" rel="noopener">privacy policy</a>.</p>
           <button class="ask-skip" id="continueBtn" type="button">Why is this happening?</button>
         </form>
       </div>
@@ -1043,6 +1054,7 @@ code, .mono {
           <input type="email" id="ctaEmailInput" required="" placeholder="you@email.com" aria-label="Your email address">
           <button type="submit">i'm in →</button>
         </div>
+        <div class="eb-privacy">campaign updates only — see our <a href="https://lookingforgrowth.uk/privacy-policy/" target="_blank" rel="noopener">privacy policy</a>.</div>
       </form>
 
       <div class="cta-actions">
@@ -1341,30 +1353,63 @@ window.LFG = window.LFG || {};
     }
   }
 
-  // Email signup (on the answer screen) — thank-you, then offer the full story.
-  // Mailing-list signup in the CTA section.
-  var ctaForm = document.getElementById('ctaEmailForm');
-  if (ctaForm) {
-    ctaForm.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var email = (document.getElementById('ctaEmailInput') || {}).value || '';
-      var safe = email.replace(/[<>&]/g, '');
-      ctaForm.innerHTML =
-        '<div class="eb-done">you\u2019re in. <span>now go shout about it.</span></div>' +
-        '<div class="eb-sub" style="margin-top:10px">we\u2019ll be in touch at ' + safe + '. first word on the pub socials, too.</div>';
+  // Email signup — both forms send the address to Brevo via /api/subscribe,
+  // then show the existing thank-you state. While the request is in flight
+  // the button is greyed out; on failure an inline error appears (the form
+  // stays intact) so the visitor can retry.
+  function subscribe(email, source) {
+    return fetch('/api/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, source: source })
+    }).then(function (r) {
+      if (!r.ok) throw new Error('subscribe failed: ' + r.status);
     });
   }
 
-  var form = document.getElementById('emailForm');
-  if (form) {
+  function wireSignup(form, input, source, errClass, onSuccess) {
     form.addEventListener('submit', function (e) {
       e.preventDefault();
-      var email = (document.getElementById('emailInput') || {}).value || '';
-      var safe = email.replace(/[<>&]/g, '');
+      var email = (input.value || '').trim();
+      var btn = form.querySelector('button[type="submit"]');
+      var label = btn ? btn.textContent : '';
+      var oldErr = form.querySelector('.' + errClass);
+      if (oldErr) oldErr.remove();
+      if (btn) { btn.disabled = true; btn.textContent = 'sending…'; }
+      subscribe(email, source).then(function () {
+        onSuccess(email.replace(/[<>&]/g, ''));
+      }).catch(function () {
+        if (btn) { btn.disabled = false; btn.textContent = label; }
+        var msg = document.createElement('p');
+        msg.className = errClass;
+        msg.textContent = 'that didn’t send — check your connection and try again.';
+        var row = form.querySelector('.ask-row, .eb-row');
+        if (row) row.insertAdjacentElement('afterend', msg);
+        else form.appendChild(msg);
+      });
+    });
+  }
+
+  // Mailing-list signup in the CTA section.
+  var ctaForm = document.getElementById('ctaEmailForm');
+  var ctaInput = document.getElementById('ctaEmailInput');
+  if (ctaForm && ctaInput) {
+    wireSignup(ctaForm, ctaInput, 'cta-footer', 'eb-err', function (safe) {
+      ctaForm.innerHTML =
+        '<div class="eb-done">you’re in. <span>now go shout about it.</span></div>' +
+        '<div class="eb-sub" style="margin-top:10px">we’ll be in touch at ' + safe + '. first word on the pub socials, too.</div>';
+    });
+  }
+
+  // Email signup on the answer screen — thank-you, then offer the full story.
+  var form = document.getElementById('emailForm');
+  var emailInput = document.getElementById('emailInput');
+  if (form && emailInput) {
+    wireSignup(form, emailInput, 'guess-game', 'ask-err', function (safe) {
       form.innerHTML =
-        '<div class="ask-done">you\u2019re in. <span>now go shout about it.</span></div>' +
-        '<p class="ask-sent">we\u2019ll be in touch at ' + safe + '. first word on the pub socials, too.</p>' +
-        '<button class="ask-skip" type="button" id="afterEmailContinue">see why this is happening \u2193</button>';
+        '<div class="ask-done">you’re in. <span>now go shout about it.</span></div>' +
+        '<p class="ask-sent">we’ll be in touch at ' + safe + '. first word on the pub socials, too.</p>' +
+        '<button class="ask-skip" type="button" id="afterEmailContinue">see why this is happening ↓</button>';
       var go = document.getElementById('afterEmailContinue');
       if (go) go.addEventListener('click', function () {
         if (window.LFG && window.LFG.advance) window.LFG.advance();
