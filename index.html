@@ -229,7 +229,8 @@
 :root {
   /* ============ BRAND COLOURS ============ */
   --lfg-black:       #000000;
-  --lfg-orange:      #EE9944;   /* Primary action colour */
+  --lfg-orange:      #EE9944;   /* Primary action colour (brand sheet: "yellow") */
+  --lfg-orange-deep: #FE5500;   /* True brand orange — motif + highlights */
   --lfg-yellow:      #EE9944;   /* Warm orange / secondary accent */
   --lfg-blue:        #79CAC4;   /* Teal / cool counterweight */
   --lfg-cream:       #EBE3D0;   /* Warm off-white background */
@@ -431,7 +432,7 @@ code, .mono {
   .nav-motif:hover { opacity: 0.72; }
   .nav-motif span { display: block; height: 4px; }
   .nav-motif span:nth-child(1){ width: 72%; background: var(--lfg-yellow); }
-  .nav-motif span:nth-child(2){ width: 96%; background: var(--lfg-orange); }
+  .nav-motif span:nth-child(2){ width: 96%; background: var(--lfg-orange-deep); }
   .nav-motif span:nth-child(3){ width: 84%; background: var(--lfg-blue); }
   .nav-motif span:nth-child(4){ width: 28%; background: var(--lfg-black); }
 
@@ -938,9 +939,75 @@ code, .mono {
   }
   .foot-brand .tld { font-size: 15px; color: var(--lfg-orange); }
   .foot-note { font-family: var(--font-body); font-size: 12px; color: rgba(235,227,208,0.55); max-width: 48ch; line-height: 1.5; }
+
+  /* ---------------- INTRO — "lost in the wind" ---------------- */
+  .intro {
+    position: fixed; inset: 0; z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--lfg-cream); cursor: pointer;
+    transition: opacity .6s var(--ease, ease);
+  }
+  .intro.done { opacity: 0; pointer-events: none; }
+  .intro-line {
+    font-family: var(--font-display); font-weight: 700; text-transform: lowercase;
+    letter-spacing: -0.02em; line-height: 1.12; text-align: center;
+    font-size: clamp(30px, 6vw, 72px); color: var(--lfg-black);
+    max-width: 16ch; text-wrap: balance; margin: 0 24px;
+  }
+  .intro-line span {
+    display: inline-block; opacity: 0; transform: translateY(0.45em); filter: blur(6px);
+    animation: intro-in .7s var(--ease, ease) forwards;
+    animation-delay: calc(120ms + var(--i) * 80ms);
+  }
+  .intro-line .o { color: var(--lfg-orange); }
+  @keyframes intro-in { to { opacity: 1; transform: none; filter: none; } }
+
+  /* the gust — words blow off to the right, streaks sweep across */
+  .intro.gust .intro-line span {
+    animation: intro-out .85s cubic-bezier(.55, 0, .9, .4) forwards;
+    animation-delay: calc(var(--i) * 50ms);
+  }
+  @keyframes intro-out {
+    0%  { opacity: 1; transform: none; filter: none; }
+    18% { opacity: 1; transform: translate(-0.16em, 0.05em) rotate(-2deg); filter: none; }
+    100% { opacity: 0; transform: translate(105vw, -0.6em) rotate(9deg); filter: blur(10px); }
+  }
+  .intro-streaks { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+  .intro-streaks i {
+    position: absolute; left: -40%; width: 36%; height: 3px; border-radius: 2px; opacity: 0;
+    background: linear-gradient(90deg, transparent, var(--lfg-yellow), transparent);
+  }
+  .intro-streaks i:nth-child(2) { top: 50%; background: linear-gradient(90deg, transparent, var(--lfg-orange-deep), transparent); }
+  .intro-streaks i:nth-child(1) { top: 32%; }
+  .intro-streaks i:nth-child(3) { top: 66%; width: 26%; background: linear-gradient(90deg, transparent, var(--lfg-blue), transparent); }
+  .intro.gust .intro-streaks i { animation: intro-streak .8s cubic-bezier(.5, 0, .8, .4) forwards; }
+  .intro.gust .intro-streaks i:nth-child(2) { animation-delay: .12s; }
+  .intro.gust .intro-streaks i:nth-child(3) { animation-delay: .22s; }
+  @keyframes intro-streak { 10% { opacity: .8; } 100% { left: 110%; opacity: 0; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .intro-line span { animation: none; opacity: 1; transform: none; filter: none; }
+    .intro.gust .intro-line span { animation: none; }
+    .intro.gust .intro-streaks i { animation: none; }
+  }
 </style>
 </head>
 <body>
+
+  <!-- INTRO — the line drifts in, then a gust blows it away. Click to skip. -->
+  <div class="intro" id="intro" aria-hidden="true">
+    <p class="intro-line">
+      <span style="--i:0">your</span>
+      <span style="--i:1">money</span>
+      <span style="--i:2">has</span>
+      <span style="--i:3">been</span>
+      <span class="o" style="--i:4">lost</span>
+      <span class="o" style="--i:5">in</span>
+      <span class="o" style="--i:6">the</span>
+      <span class="o" style="--i:7">wind.</span>
+    </p>
+    <div class="intro-streaks"><i></i><i></i><i></i></div>
+  </div>
 
   <nav class="top">
     <div class="wrap">
@@ -1417,6 +1484,32 @@ window.LFG = window.LFG || {};
       });
     });
   }
+})();
+</script>
+
+<script>
+(function () {
+  // Intro sequence: words drift in, hold a beat, gust blows them away,
+  // panel fades out. Click skips straight through.
+  var intro = document.getElementById('intro');
+  if (!intro) return;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var finished = false;
+  function finish() {
+    if (finished) return;
+    finished = true;
+    intro.classList.add('done');
+    setTimeout(function () {
+      if (intro.parentNode) intro.parentNode.removeChild(intro);
+    }, 650);
+  }
+  function gust() {
+    if (finished) return;
+    intro.classList.add('gust');
+    setTimeout(finish, reduce ? 0 : 950);
+  }
+  setTimeout(gust, reduce ? 900 : 1900);
+  intro.addEventListener('click', finish);
 })();
 </script>
 
