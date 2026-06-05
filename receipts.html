@@ -86,6 +86,14 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
 .farm:first-of-type { margin-top: clamp(26px, 4vw, 34px); }
 .farm-head { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; flex-wrap: wrap; }
 .farm-name { font-family: var(--font-display); font-weight: 700; text-transform: lowercase; letter-spacing: -0.02em; font-size: clamp(20px, 3.4vw, 28px); line-height: 1.05; }
+.fuel {
+  display: inline-block; vertical-align: middle; margin-left: 10px;
+  font-family: var(--font-body); font-weight: 700; font-size: 11px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--lfg-orange);
+  border: 1px solid rgba(238,153,68,0.5); padding: 3px 8px;
+}
+.gap-head { margin-top: clamp(36px, 6vw, 52px); }
+.gap-head .sum-sub { margin-top: 8px; }
 .farm-cost { font-family: var(--font-display); font-weight: 700; font-size: clamp(20px, 3.4vw, 28px); color: var(--lfg-orange); white-space: nowrap; }
 .farm-cost a { color: inherit; text-decoration: none; border-bottom: 3px solid rgba(238,153,68,0.45); transition: border-color .2s var(--ease), color .2s var(--ease); }
 .farm-cost a:hover { color: var(--lfg-cream); border-color: var(--lfg-cream); }
@@ -137,7 +145,8 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
       <div class="check">
         don't take our word for it: these figures are read live from Elexon,
         the official body that settles Britain's electricity market.
-        replacement-power costs are shown once a day fully settles.
+        the ledger doesn't say which purchase replaced which wind farm, so we
+        pair them the standard way — same half-hour, cheapest first.
       </div>
     </div>
   </main>
@@ -210,46 +219,62 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
       sum.appendChild(amountWrap);
       var subBits = 'paid to switch wind farms off — ' + d.paymentCount + ' payment' + (d.paymentCount === 1 ? '' : 's') +
         ' to ' + d.farmCount + ' farm' + (d.farmCount === 1 ? '' : 's') + ', ' +
-        Math.round(d.curtailedMWh).toLocaleString('en-GB') + ' MWh thrown away.';
-      if (d.replaceCost !== null) {
-        subBits += ' replacing that energy cost another ' + gbp(d.replaceCost) + ' — day total ' + gbp(d.switchOffCost + d.replaceCost) + '.';
-      } else if (d.isToday) {
-        subBits += ' the replacement-power bill is tallied when the day settles.';
-      }
+        Math.round(d.curtailedMWh).toLocaleString('en-GB') + ' MWh thrown away.' +
+        ' buying that energy back cost another ' + gbp(d.replaceCost) +
+        ' — day total ' + gbp(d.switchOffCost + d.replaceCost) + (d.isToday ? ' so far' : '') + '.';
       var sub = el('p', 'sum-sub');
       sub.textContent = subBits;
       sum.appendChild(sub);
       content.appendChild(sum);
 
-      d.farms.forEach(function (f) {
+      // one card per plant; stackType picks which official ledger the
+      // amount and verify links point at (bid = switch-off, offer = turn-up)
+      function plantCard(f, stackType, detailText) {
+        var ledger = 'https://data.elexon.co.uk/bmrs/api/v1/balancing/settlement/stack/all/' + stackType + '/' + d.date + '/' + f.periods[0];
         var card = el('div', 'farm');
         var head = el('div', 'farm-head');
-        head.appendChild(el('div', 'farm-name', f.name.toLowerCase()));
-        // the amount links straight to the official ledger page it came from
+        var nameWrap = el('div', 'farm-name', f.name.toLowerCase());
+        if (f.fuel) nameWrap.appendChild(el('span', 'fuel', f.fuel));
+        head.appendChild(nameWrap);
         var costWrap = el('div', 'farm-cost');
         var costLink = el('a', '', gbp(f.cost));
-        costLink.href = 'https://data.elexon.co.uk/bmrs/api/v1/balancing/settlement/stack/all/bid/' + d.date + '/' + f.periods[0];
+        costLink.href = ledger;
         costLink.target = '_blank'; costLink.rel = 'noopener';
-        costLink.title = 'open the official Elexon record for this farm’s first half-hour';
+        costLink.title = 'open the official Elexon record for this plant’s first half-hour';
         costWrap.appendChild(costLink);
         head.appendChild(costWrap);
         card.appendChild(head);
-        var sp = spells(f.periods);
-        card.appendChild(el('p', 'farm-detail',
-          'paid to stop ' + (sp.length > 1 ? 'during ' : 'between ') + sp.join(', ') +
-          ' — ' + Math.round(f.mwh).toLocaleString('en-GB') + ' MWh of clean power not made.'));
-        // direct line to the official ledger entry for this farm's first
-        // half-hour of the day — search the grid code on that page to see
-        // the raw record behind this card
+        card.appendChild(el('p', 'farm-detail', detailText));
         var verify = el('p', 'farm-verify');
         verify.appendChild(document.createTextNode('grid code ' + f.units.join(', ') + ' — '));
         var va = el('a', '', 'check the official record for ' + periodTime(f.periods[0]) + ' →');
-        va.href = 'https://data.elexon.co.uk/bmrs/api/v1/balancing/settlement/stack/all/bid/' + d.date + '/' + f.periods[0];
+        va.href = ledger;
         va.target = '_blank'; va.rel = 'noopener';
         verify.appendChild(va);
         card.appendChild(verify);
-        content.appendChild(card);
+        return card;
+      }
+
+      d.farms.forEach(function (f) {
+        var sp = spells(f.periods);
+        content.appendChild(plantCard(f, 'bid',
+          'paid to stop ' + (sp.length > 1 ? 'during ' : 'between ') + sp.join(', ') +
+          ' — ' + Math.round(f.mwh).toLocaleString('en-GB') + ' MWh of clean power not made.'));
       });
+
+      if (d.replacements && d.replacements.length) {
+        var gapHead = el('div', 'gap-head');
+        gapHead.appendChild(el('p', 'sum-label', 'and who was paid to fill the gap'));
+        gapHead.appendChild(el('p', 'sum-sub',
+          'the same energy, bought twice: ' + gbp(d.replaceCost) + ' to these generators for the power the wind farms above were paid not to make.'));
+        content.appendChild(gapHead);
+        d.replacements.forEach(function (f) {
+          var sp = spells(f.periods);
+          content.appendChild(plantCard(f, 'offer',
+            'paid to turn up ' + (sp.length > 1 ? 'during ' : 'between ') + sp.join(', ') +
+            ' — ' + Math.round(f.mwh).toLocaleString('en-GB') + ' MWh of replacement power.'));
+        });
+      }
     }
 
     if (d.worstDay && d.worstDay.date !== d.date) {

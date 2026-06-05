@@ -34,12 +34,22 @@ async function pool(items, n, fn) {
   return out;
 }
 
-async function windUnits() {
+var FUEL_LABELS = {
+  CCGT: 'gas', OCGT: 'gas peaker', COAL: 'coal', BIOMASS: 'biomass',
+  NUCLEAR: 'nuclear', NPSHYD: 'hydro', PS: 'pumped storage', WIND: 'wind', OTHER: 'other'
+};
+
+async function allUnits() {
   if (windCache) return windCache;
   var all = await getJson(BASE + '/reference/bmunits/all');
   windCache = new Map(all
-    .filter(function (u) { return u.fuelType === 'WIND' && u.elexonBmUnit; })
-    .map(function (u) { return [u.elexonBmUnit, u.bmUnitName || u.elexonBmUnit]; }));
+    .filter(function (u) { return u.elexonBmUnit; })
+    .map(function (u) {
+      return [u.elexonBmUnit, {
+        name: u.bmUnitName || u.elexonBmUnit,
+        fuelType: u.fuelType || null
+      }];
+    }));
   return windCache;
 }
 
@@ -58,37 +68,85 @@ function londonToday() {
 }
 
 async function dayReceipts(date) {
-  var wind = await windUnits();
+  var units = await allUnits();
   var urls = [];
-  for (var p = 1; p <= 50; p++) urls.push(BASE + '/balancing/settlement/stack/all/bid/' + date + '/' + p);
+  ['bid', 'offer'].forEach(function (k) {
+    for (var p = 1; p <= 50; p++) urls.push(BASE + '/balancing/settlement/stack/all/' + k + '/' + date + '/' + p);
+  });
   var res = await pool(urls, 25, getJson);
+  var bidsByPeriod = res.slice(0, 50);
+  var offersByPeriod = res.slice(50);
 
+  // --- the wind farms paid to switch off ---
   var farms = {}; // name -> { name, units:Set, cost, mwh, periods:Set }
   var paymentCount = 0;
-  res.forEach(function (rows, idx) {
+  var perPeriodNeed = {}; // curtailed volume per half-hour, for the replacement walk
+  bidsByPeriod.forEach(function (rows, idx) {
     rows.forEach(function (e) {
-      if (!wind.has(e.id) || !e.soFlag) return;
+      var u = units.get(e.id);
+      if (!u || u.fuelType !== 'WIND' || !e.soFlag) return;
       paymentCount++;
-      var name = farmName(wind.get(e.id));
+      var name = farmName(u.name);
       var f = farms[name] || (farms[name] = { name: name, units: {}, cost: 0, mwh: 0, periods: {} });
       f.units[e.id] = true;
       f.cost += e.originalPrice * e.volume;
       f.mwh += Math.abs(e.volume);
       f.periods[idx + 1] = true;
+      perPeriodNeed[idx + 1] = (perPeriodNeed[idx + 1] || 0) + Math.abs(e.volume);
     });
   });
 
-  var list = Object.values(farms).map(function (f) {
-    return {
-      name: f.name,
-      units: Object.keys(f.units).sort(),
-      cost: Math.round(f.cost * 100) / 100,
-      mwh: Math.round(f.mwh * 100) / 100,
-      periods: Object.keys(f.periods).map(Number).sort(function (a, b) { return a - b; })
-    };
-  }).sort(function (a, b) { return b.cost - a.cost; });
+  // --- the generators paid to fill the gap ---
+  // The ledger doesn't tag which purchase replaced which wind farm, so we
+  // pair them the standard way: same half-hour, cheapest accepted offers
+  // first (short-spike CADL acceptances excluded) — the same walk that
+  // produces the replacement totals in api/wasted.js and the data file.
+  var gap = {}; // name|fuel -> { name, fuel, units:Set, cost, mwh, periods:Set }
+  var replaceCost = 0;
+  Object.keys(perPeriodNeed).forEach(function (p) {
+    var need = perPeriodNeed[p];
+    var acc = 0;
+    var stack = (offersByPeriod[p - 1] || [])
+      .filter(function (e) { return !e.cadlFlag; })
+      .sort(function (a, b) {
+        if (!a.soFlag !== !b.soFlag) return a.soFlag ? 1 : -1;
+        return (a.sequenceNumber || 0) - (b.sequenceNumber || 0);
+      });
+    for (var i = 0; i < stack.length; i++) {
+      var e = stack[i];
+      var vol = e.volume;
+      if (acc + vol > need) vol = vol * Math.min(Math.max((need - acc) / e.volume, 0), 1);
+      acc += vol;
+      var cost = e.originalPrice * vol;
+      replaceCost += cost;
+      var u = units.get(e.id) || { name: e.id, fuelType: null };
+      var fuel = FUEL_LABELS[u.fuelType] || 'other';
+      var key = farmName(u.name) + '|' + fuel;
+      var g = gap[key] || (gap[key] = { name: farmName(u.name), fuel: fuel, units: {}, cost: 0, mwh: 0, periods: {} });
+      g.units[e.id] = true;
+      g.cost += cost;
+      g.mwh += vol;
+      g.periods[p] = true;
+      if (acc >= need) break;
+    }
+  });
 
-  var settled = history.find(function (r) { return r.date === date; });
+  function finish(obj, extra) {
+    return Object.values(obj).map(function (f) {
+      var row = {
+        name: f.name,
+        units: Object.keys(f.units).sort(),
+        cost: Math.round(f.cost * 100) / 100,
+        mwh: Math.round(f.mwh * 100) / 100,
+        periods: Object.keys(f.periods).map(Number).sort(function (a, b) { return a - b; })
+      };
+      if (extra) row.fuel = f.fuel;
+      return row;
+    }).sort(function (a, b) { return b.cost - a.cost; });
+  }
+  var list = finish(farms, false);
+  var gapList = finish(gap, true);
+
   var worst = history.reduce(function (best, r) {
     var t = r.switchOffCost + r.replaceCost;
     return (!best || t > best.total) ? { date: r.date, total: Math.round(t) } : best;
@@ -101,8 +159,9 @@ async function dayReceipts(date) {
     farmCount: list.length,
     switchOffCost: Math.round(list.reduce(function (s, f) { return s + f.cost; }, 0) * 100) / 100,
     curtailedMWh: Math.round(list.reduce(function (s, f) { return s + f.mwh; }, 0) * 100) / 100,
-    replaceCost: settled ? settled.replaceCost : null,
+    replaceCost: Math.round(replaceCost * 100) / 100,
     farms: list,
+    replacements: gapList,
     worstDay: worst,
     source: 'Elexon Insights API (data.elexon.co.uk)'
   };
