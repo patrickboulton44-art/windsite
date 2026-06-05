@@ -417,7 +417,11 @@ code, .mono {
     position: sticky; top: 0; z-index: 50;
     background: var(--lfg-cream);
     border-bottom: 1px solid var(--rule);
+    transition: opacity .6s var(--ease, ease);
   }
+  /* hidden while the intro overlay is still in the page; the moment the
+     intro is removed this rule stops applying and the bar fades in */
+  .intro ~ nav.top { opacity: 0; }
   nav.top .wrap {
     height: 60px;
     display: flex; align-items: center; justify-content: space-between;
