@@ -858,20 +858,24 @@ code, .mono {
     margin-top: clamp(34px, 5vw, 48px);
     display: grid; grid-template-columns: 1fr; gap: 14px; max-width: 560px;
   }
-  .cta-btn {
+  /* follow-the-movement panel — black card with three social links */
+  .cta-socials {
     display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    flex-wrap: wrap;
     background: var(--lfg-black); color: var(--lfg-cream);
-    text-decoration: none; padding: 20px 24px;
-    border: 2px solid var(--lfg-black);
-    transition: background var(--dur-base) var(--ease), color var(--dur-base) var(--ease), transform var(--dur-fast) var(--ease);
+    padding: 20px 24px; border: 2px solid var(--lfg-black);
   }
-  .cta-btn .lab { font-family: var(--font-body); font-weight: 700; font-size: clamp(16px, 2.2vw, 19px); }
-  .cta-btn .sm { display: block; font-weight: 500; font-size: 13px; color: rgba(235,227,208,0.65); margin-top: 3px; }
-  .cta-btn .arrow { font-size: 22px; transition: transform var(--dur-base) var(--ease); flex-shrink: 0; }
-  .cta-btn:hover { background: var(--lfg-cream); color: var(--lfg-black); }
-  .cta-btn:hover .sm { color: var(--fg-muted); }
-  .cta-btn:hover .arrow { transform: translateX(5px); }
-  .cta-btn:active { transform: translate(2px, 2px); }
+  .cta-socials .lab { font-family: var(--font-body); font-weight: 700; font-size: clamp(16px, 2.2vw, 19px); }
+  .cta-socials .sm { display: block; font-weight: 500; font-size: 13px; color: rgba(235,227,208,0.65); margin-top: 3px; }
+  .soc-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .soc-row a {
+    font-family: var(--font-body); font-weight: 700; font-size: 14px;
+    color: var(--lfg-cream); text-decoration: none;
+    border: 2px solid rgba(235,227,208,0.4); padding: 8px 14px;
+    transition: background var(--dur-base) var(--ease), color var(--dur-base) var(--ease), border-color var(--dur-base) var(--ease);
+  }
+  .soc-row a:hover { background: var(--lfg-cream); border-color: var(--lfg-cream); color: var(--lfg-black); }
+  .soc-row a:active { transform: translate(2px, 2px); }
 
   /* email signup */
   .email-box {
@@ -1130,14 +1134,14 @@ code, .mono {
       </form>
 
       <div class="cta-actions">
-        <a class="cta-btn" href="https://x.com/lookingforgrowth" target="_blank" rel="noopener">
-          <span class="lab">follow the movement<span class="sm">@lookingforgrowth on X</span></span>
-          <span class="arrow" aria-hidden="true">→</span>
-        </a>
-        <a class="cta-btn" href="#">
-          <span class="lab">come to the pub<span class="sm">hear about our socials — first round's the argument</span></span>
-          <span class="arrow" aria-hidden="true">→</span>
-        </a>
+        <div class="cta-socials">
+          <span class="lab">follow the movement<span class="sm">pick your feed</span></span>
+          <span class="soc-row">
+            <a href="https://x.com/lfg_uk" target="_blank" rel="noopener" aria-label="LFG on X">X</a>
+            <a href="https://www.instagram.com/lookingforgrowthuk" target="_blank" rel="noopener" aria-label="LFG on Instagram">instagram</a>
+            <a href="https://www.youtube.com/@lookingforgrowthuk" target="_blank" rel="noopener" aria-label="LFG on YouTube">youtube</a>
+          </span>
+        </div>
       </div>
     </div>
   </section>
