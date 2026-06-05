@@ -1046,16 +1046,16 @@ code, .mono {
       <div class="quiz" id="quiz">
         <p class="q-kicker">
 </p>
-        <h1 class="q-headline">how much has the government wasted turning off wind farms today?</h1>
+        <h1 class="q-headline">how much has the government wasted turning off wind farms this week?</h1>
 
         <div class="spinner" id="spinner">
           <span class="sp-amount" id="spAmount">£0</span>
           <div class="sp-steppers">
-            <button class="sp-btn" id="spDown" type="button" aria-label="subtract £500">−</button>
-            <button class="sp-btn" id="spUp" type="button" aria-label="add £500">+</button>
+            <button class="sp-btn" id="spDown" type="button" aria-label="subtract £1,000">−</button>
+            <button class="sp-btn" id="spUp" type="button" aria-label="add £1,000">+</button>
           </div>
         </div>
-        <p class="sp-hint">your guess for today so far · £500 a tap, hold to move faster</p>
+        <p class="sp-hint">your guess for this week so far · £1,000 a tap, hold to move faster</p>
 
         <button class="reveal-btn" id="revealBtn" type="button">lock in my guess<span aria-hidden="true">→</span></button>
       </div>
@@ -1064,7 +1064,7 @@ code, .mono {
       <div class="answer" id="answer" hidden="">
         <p class="a-label">you guessed</p>
         <div class="a-guess" id="aGuess">£0</div>
-        <p class="a-label">wasted today so far — and still climbing</p>
+        <p class="a-label">wasted this week so far — and still climbing</p>
         <div class="a-real"><span class="m-sym">£</span><span id="sinceAmt">0</span></div>
         <p class="a-sub">and counting — <span id="meterRate">£47.56 a second</span></p>
         <p class="verdict" id="verdict">not even close — we burns through cash faster than that.</p>
@@ -1294,11 +1294,13 @@ window.LFG = window.LFG || {};
   // ---------- Guessing game ----------
   // The answer is what's been wasted since the start of TODAY (local midnight),
   // accruing at the per-second rate and still climbing live.
-  function dayStart() {
+  function weekStart() {
+    // Monday 00:00 local time
     var n = new Date();
-    return new Date(n.getFullYear(), n.getMonth(), n.getDate(), 0, 0, 0, 0).getTime();
+    var sinceMonday = (n.getDay() + 6) % 7; // getDay(): Sun=0 … Sat=6
+    return new Date(n.getFullYear(), n.getMonth(), n.getDate() - sinceMonday, 0, 0, 0, 0).getTime();
   }
-  var loadT = dayStart();
+  var loadT = weekStart();
   function rate() { return (window.LFG && window.LFG.rate) ? window.LFG.rate : 47.56; }
 
   // Live "since you opened" value — this IS the answer, and it keeps climbing.
@@ -1315,7 +1317,7 @@ window.LFG = window.LFG || {};
 
   // ---- stepper: single value, £1,000 a step, press-and-hold to accelerate ----
   var guess = 0;
-  var STEP = 500, MAXG = 9999000;
+  var STEP = 1000, MAXG = 99999000;
   var amountEl = document.getElementById('spAmount');
   function renderGuess() { amountEl.textContent = '\u00a3' + guess.toLocaleString('en-GB'); }
   function bump(dir) {
@@ -1332,8 +1334,8 @@ window.LFG = window.LFG || {};
       e.preventDefault();
       bump(dir);
       // after a short delay, repeat — ramping up hard so you can sweep into the
-      // millions in a few seconds (a daily total runs to ~£4m), while a single
-      // tap still nudges by exactly £100.
+      // tens of millions in a few seconds (a weekly total runs to ~£29m), while
+      // a single tap still nudges by exactly £1,000.
       t1 = setTimeout(function () {
         var n = 0;
         t2 = setInterval(function () {
@@ -1361,18 +1363,18 @@ window.LFG = window.LFG || {};
   var revealBtn = document.getElementById('revealBtn');
 
   function verdict(guess, real) {
-    if (real <= 0) return 'the day\u2019s just begun \u2014 and it\u2019s already started.';
+    if (real <= 0) return 'the week\u2019s just begun \u2014 and it\u2019s already started.';
     if (guess === 0) return 'zero? if only. it never stops.';
-    var fullDay = 86400 * rate(); // most they can burn in one day (~\u00a34.1m)
+    var fullWeek = 604800 * rate(); // most they can burn in one week (~\u00a328.8m)
     var r = guess / real;
     // under the live figure
     if (r < 0.5) return 'not even close \u2014 it burns through cash faster than that.';
     if (r < 0.9) return 'you guessed low. it\u2019s already worse than that.';
     if (r <= 1.1) return 'spot on \u2014 and that\u2019s the bleak part.';
-    // over the live figure, but the day will still climb past your guess
-    if (guess <= fullDay) return 'you went high \u2014 but it\u2019ll still climb past your guess before midnight.';
-    // over a whole day\u2019s worth of waste
-    return 'you\u2019ve overshot \u2014 even they can\u2019t waste that much in a single day.';
+    // over the live figure, but the week will still climb past your guess
+    if (guess <= fullWeek) return 'you went high \u2014 but it\u2019ll still climb past your guess before sunday night.';
+    // over a whole week\u2019s worth of waste
+    return 'you\u2019ve overshot \u2014 even they can\u2019t waste that much in a single week.';
   }
 
   function reveal() {
