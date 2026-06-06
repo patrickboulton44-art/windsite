@@ -45,7 +45,7 @@
   "date": "2026-01-08",
   "curtailedMWh": 0,
   "switchOffCost": 0,
-  "replaceCost": 0.0
+  "replaceCost": 0
  },
  {
   "date": "2026-01-09",
@@ -261,7 +261,7 @@
   "date": "2026-02-13",
   "curtailedMWh": 0,
   "switchOffCost": 0,
-  "replaceCost": 0.0
+  "replaceCost": 0
  },
  {
   "date": "2026-02-14",
@@ -465,7 +465,7 @@
   "date": "2026-03-19",
   "curtailedMWh": 0,
   "switchOffCost": 0,
-  "replaceCost": 0.0
+  "replaceCost": 0
  },
  {
   "date": "2026-03-20",
@@ -489,7 +489,7 @@
   "date": "2026-03-23",
   "curtailedMWh": 45523.91,
   "switchOffCost": 793667.92,
-  "replaceCost": 6893834.0
+  "replaceCost": 6893834
  },
  {
   "date": "2026-03-24",
@@ -675,31 +675,31 @@
   "date": "2026-04-23",
   "curtailedMWh": 0,
   "switchOffCost": 0,
-  "replaceCost": 0.0
+  "replaceCost": 0
  },
  {
   "date": "2026-04-24",
   "curtailedMWh": 0,
   "switchOffCost": 0,
-  "replaceCost": 0.0
+  "replaceCost": 0
  },
  {
   "date": "2026-04-25",
   "curtailedMWh": 0,
   "switchOffCost": 0,
-  "replaceCost": 0.0
+  "replaceCost": 0
  },
  {
   "date": "2026-04-26",
   "curtailedMWh": 0,
   "switchOffCost": 0,
-  "replaceCost": 0.0
+  "replaceCost": 0
  },
  {
   "date": "2026-04-27",
   "curtailedMWh": 0,
   "switchOffCost": 0,
-  "replaceCost": 0.0
+  "replaceCost": 0
  },
  {
   "date": "2026-04-28",
@@ -710,7 +710,7 @@
  {
   "date": "2026-04-29",
   "curtailedMWh": 55.25,
-  "switchOffCost": 2210.0,
+  "switchOffCost": 2210,
   "replaceCost": 6394.5
  },
  {
@@ -729,13 +729,13 @@
   "date": "2026-05-02",
   "curtailedMWh": 0,
   "switchOffCost": 0,
-  "replaceCost": 0.0
+  "replaceCost": 0
  },
  {
   "date": "2026-05-03",
   "curtailedMWh": 0,
   "switchOffCost": 0,
-  "replaceCost": 0.0
+  "replaceCost": 0
  },
  {
   "date": "2026-05-04",
@@ -819,7 +819,7 @@
   "date": "2026-05-17",
   "curtailedMWh": 0,
   "switchOffCost": 0,
-  "replaceCost": 0.0
+  "replaceCost": 0
  },
  {
   "date": "2026-05-18",
@@ -903,7 +903,7 @@
   "date": "2026-05-31",
   "curtailedMWh": 0,
   "switchOffCost": 0,
-  "replaceCost": 0.0
+  "replaceCost": 0
  },
  {
   "date": "2026-06-01",
@@ -927,6 +927,12 @@
   "date": "2026-06-04",
   "curtailedMWh": 16419.43,
   "switchOffCost": 528284.99,
-  "replaceCost": 2233665.68
+  "replaceCost": 2234299.54
+ },
+ {
+  "date": "2026-06-05",
+  "curtailedMWh": 35282.2,
+  "switchOffCost": 865545.08,
+  "replaceCost": 5167828.57
  }
 ]
