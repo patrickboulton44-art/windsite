@@ -940,5 +940,11 @@
   "curtailedMWh": 11166.77,
   "switchOffCost": 123616.43,
   "replaceCost": 1530841.74
+ },
+ {
+  "date": "2026-06-07",
+  "curtailedMWh": 36308.39,
+  "switchOffCost": 1463011.01,
+  "replaceCost": 5248128.01
  }
 ]
