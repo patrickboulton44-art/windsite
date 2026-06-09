@@ -501,7 +501,9 @@ code, .mono {
        top-alignment so the top stays scroll-reachable (plain 'center' clips it) */
     align-items: safe center;
     background-color: var(--lfg-cream); color: var(--lfg-black);
-    padding: clamp(84px, 13vh, 130px) 20px clamp(40px, 8vh, 80px);
+    /* symmetric vertical padding so the answer sits at true optical centre
+       rather than low with an empty band up top; top value still clears the nav */
+    padding: clamp(76px, 8vh, 96px) 20px;
     overflow: hidden;
   }
   /* orange is the section's own background-colour so it fills the entire
