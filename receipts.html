@@ -87,26 +87,26 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
 
 #status { margin-top: 26px; font-weight: 700; color: rgba(0,0,0,0.55); }
 
-/* Layout via named areas so the receipt can sit top-right on desktop but
-   between the summary and the amounts on mobile.
-   mobile order:  head → summary → receipt → cards
-   desktop:       head/summary/cards stack on the left, receipt fills the right */
+/* Left side is one block (so its content stays tight at the top and the tall
+   receipt column can't stretch it); the receipt sits to its right on desktop.
+   On mobile the left block collapses (display:contents) so the receipt can be
+   ordered between the summary and the amounts:  head → summary → receipt → cards */
 .receipt-layout {
-  display: grid; grid-template-columns: 1fr; column-gap: clamp(30px, 4vw, 52px); row-gap: 0;
+  display: grid; grid-template-columns: 1fr; column-gap: clamp(30px, 4vw, 52px);
   margin-top: clamp(24px, 4vw, 34px); align-items: start;
-  grid-template-areas: "head" "summary" "receipt" "cards";
 }
-.rl-head { grid-area: head; min-width: 0; }
-.rl-summary { grid-area: summary; min-width: 0; margin-top: clamp(16px, 3vw, 24px); }
-.rl-cards { grid-area: cards; min-width: 0; }
-.rl-receipt { grid-area: receipt; display: flex; flex-direction: column; align-items: center; gap: 14px; margin: clamp(24px,5vw,30px) 0; }
+.rl-left { min-width: 0; display: flex; flex-direction: column; }
+.rl-head, .rl-summary, .rl-cards { min-width: 0; }
+.rl-summary { margin-top: clamp(16px, 3vw, 24px); }
+.rl-receipt { display: flex; flex-direction: column; align-items: center; gap: 14px; margin: clamp(24px,5vw,30px) 0; }
 .receipt-fit { width: 360px; max-width: 100%; }
 @media (min-width: 900px) {
-  .receipt-layout {
-    grid-template-columns: minmax(0, 1fr) 360px;
-    grid-template-areas: "head receipt" "summary receipt" "cards receipt";
-  }
+  .receipt-layout { grid-template-columns: minmax(0, 1fr) 360px; }
   .rl-receipt { position: sticky; top: 72px; margin: 0; align-self: start; }
+}
+@media (max-width: 899px) {
+  .rl-left { display: contents; }
+  .rl-head { order: 1; } .rl-summary { order: 2; } .rl-receipt { order: 3; } .rl-cards { order: 4; }
 }
 
 .summary { margin-top: 4px; }
@@ -258,6 +258,7 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
   <main>
     <div class="wrap">
       <div class="receipt-layout">
+        <div class="rl-left">
         <div class="rl-head">
           <h1>the receipts</h1>
           <p class="lede">every time a wind farm is paid to switch off, it lands on the official record. pick a day — here's who was paid, when, and how much, with the bill made out in full.</p>
@@ -277,6 +278,7 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
           <button class="reveal-toggle" id="revealToggle" type="button" aria-expanded="false" hidden>see where your money went <span aria-hidden="true">↓</span></button>
           <div id="content" hidden></div>
           <p class="worst" id="worst" hidden></p>
+        </div>
         </div>
 
         <aside class="rl-receipt" id="receiptCol" hidden>
@@ -331,7 +333,7 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
                 <div class="amt" data-role="total"></div>
               </div>
 
-              <p class="kicker">this is the cost of turning off cheap, clean power.<br><span class="hot">tell them to leave it on.</span></p>
+              <p class="kicker">this is the cost of poor infrastructure.<br><span class="hot">due immediately.</span></p>
 
               <div class="barcode" aria-hidden="true"></div>
               <p class="barcode-num">L F G &nbsp; 0 0 1 &nbsp; G R O W T H</p>
