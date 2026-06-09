@@ -653,7 +653,13 @@ code, .mono {
     .answer-main { display: contents; }
     .answer-history { order: 1; }
     .answer-main .ask { order: 2; }
+    /* choreography: the big number lands large and zooms into place… */
+    section.game.answered .a-real { animation: num-zoom .7s cubic-bezier(.2,.7,.3,1) both; }
+    /* …then the email form + three-day panel fade in together (on .with-history) */
+    .answer-main .ask { opacity: 0; transition: opacity .6s ease; }
+    .with-history .answer-main .ask { opacity: 1; }
   }
+  @keyframes num-zoom { from { transform: scale(1.55); } to { transform: scale(1); } }
   @media (min-width: 880px) {
     .with-history .game-inner { width: min(100%, 1120px); }
     .with-history .answer { flex-direction: row; align-items: flex-start; justify-content: center; gap: clamp(40px,5vw,72px); }
@@ -670,6 +676,8 @@ code, .mono {
   @media (prefers-reduced-motion: reduce) {
     .answer-history, .with-history .ah-row, .with-history .ah-cta { transition: none; animation: none; }
     .with-history .ah-row, .with-history .ah-cta { opacity: 1; transform: none; }
+    section.game.answered .a-real { animation: none; }
+    .answer-main .ask { opacity: 1; }
   }
 
   /* email capture on the answer screen (cream bg) */
