@@ -90,10 +90,12 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
 /* two-column: breakdown left, receipt right */
 .receipt-layout { display: grid; grid-template-columns: 1fr; gap: clamp(30px, 4vw, 52px); margin-top: clamp(24px, 4vw, 34px); align-items: start; }
 .rl-left { min-width: 0; }
-.rl-right { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.rl-right { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.receipt-fit { width: 360px; max-width: 100%; transform-origin: top center; }
 @media (min-width: 900px) {
   .receipt-layout { grid-template-columns: minmax(0, 1fr) 360px; }
-  .rl-right { position: sticky; top: 80px; }
+  /* keep buttons + the full receipt in view without scrolling to the bottom */
+  .rl-right { position: sticky; top: 72px; }
 }
 
 .summary { margin-top: 4px; }
@@ -251,6 +253,13 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
         </div>
 
         <aside class="rl-right" id="receiptCol" hidden>
+          <div class="receipt-actions">
+            <button class="r-btn" id="dlBtn" type="button">⬇ download</button>
+            <button class="r-btn secondary" id="xBtn" type="button">share → X</button>
+            <button class="r-btn secondary" id="igBtn" type="button">share → instagram</button>
+          </div>
+          <p class="r-hint" id="rHint"></p>
+          <div class="receipt-fit" id="receiptFit">
           <div class="receipt-wrap" id="receiptWrap">
             <div class="receipt" data-currency="£">
               <div class="brandbar" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
@@ -301,13 +310,7 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
               <p class="barcode-num">L F G &nbsp; 0 0 1 &nbsp; G R O W T H</p>
             </div>
           </div>
-
-          <div class="receipt-actions">
-            <button class="r-btn" id="dlBtn" type="button">⬇ download</button>
-            <button class="r-btn secondary" id="xBtn" type="button">share → X</button>
-            <button class="r-btn secondary" id="igBtn" type="button">share → instagram</button>
           </div>
-          <p class="r-hint" id="rHint"></p>
         </aside>
       </div>
 
@@ -331,6 +334,7 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
     var worstEl = document.getElementById('worst');
     var receiptCol = document.getElementById('receiptCol');
     var receiptWrap = document.getElementById('receiptWrap');
+    var receiptFit = document.getElementById('receiptFit');
     var rHint = document.getElementById('rHint');
 
     var today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/London' });
@@ -391,7 +395,28 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
       receipt.querySelector('.r-date').textContent = shortDate(d.date) + (d.isToday ? ' (so far)' : '');
       recalcReceipt();
       receiptCol.hidden = false;
+      fitReceipt();
     }
+    // on desktop, shrink the receipt just enough that the whole thing — and
+    // the buttons above it — fit on screen without scrolling to the bottom
+    function fitReceipt() {
+      receiptFit.style.transform = '';
+      receiptFit.style.marginBottom = '';
+      if (window.innerWidth < 900) return;
+      var h = receiptWrap.offsetHeight;
+      if (!h) return;
+      // room the receipt has once the column is stuck: viewport minus the
+      // sticky offset, the buttons/hint above it, and a little breathing room
+      var stickyTop = 72, above = receiptFit.offsetTop;
+      var avail = window.innerHeight - stickyTop - above - 24;
+      var scale = Math.max(0.5, Math.min(1, avail / h));
+      if (scale < 1) {
+        receiptFit.style.transform = 'scale(' + scale + ')';
+        receiptFit.style.marginBottom = (-(1 - scale) * h) + 'px'; // collapse the freed space
+      }
+    }
+    window.addEventListener('resize', fitReceipt);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitReceipt);
 
     function render(d) {
       content.textContent = '';
