@@ -497,6 +497,9 @@ code, .mono {
   section.game {
     position: relative; min-height: 100svh;
     display: flex; align-items: center; justify-content: center;
+    /* when the answer + panel is taller than the screen, 'safe' falls back to
+       top-alignment so the top stays scroll-reachable (plain 'center' clips it) */
+    align-items: safe center;
     background: var(--lfg-cream); color: var(--lfg-black);
     padding: clamp(84px, 13vh, 130px) 20px clamp(40px, 8vh, 80px);
     overflow: hidden;
@@ -586,6 +589,8 @@ code, .mono {
     margin-top: 8px; font-variant-numeric: tabular-nums; white-space: nowrap;
   }
   .a-real .m-sym { margin-right: 0.03em; }
+  /* on phones the long ledger figure was kissing both edges — size it to fit */
+  @media (max-width: 560px) { .a-real { font-size: clamp(30px, 8.8vw, 56px); } }
   .a-sub {
     margin: 16px 0 0; font-family: var(--font-body); font-weight: 500;
     font-size: clamp(13px,1.7vw,16px); color: rgba(0,0,0,0.6);
@@ -626,12 +631,14 @@ code, .mono {
   @media (min-width: 880px) {
     .with-history .game-inner { width: min(100%, 1120px); }
     .with-history .answer { flex-direction: row; align-items: flex-start; justify-content: center; gap: clamp(40px,5vw,72px); }
-    .with-history .answer-main { text-align: left; flex: 0 1 600px; }
+    .with-history .answer-main { text-align: left; flex: 1 1 auto; min-width: 0; }
+    /* hold the big figure inside its column so it can't collide with the panel */
+    .with-history .answer-main .a-real { font-size: clamp(40px, 5vw, 76px); }
     .with-history .answer-main .a-guess,
     .with-history .answer-main .verdict { margin-left: 0; margin-right: auto; }
     .with-history .answer-main .ask { margin-left: 0; }
     .with-history .answer-history {
-      flex: 0 0 auto; max-height: none; margin-top: clamp(40px,4vw,56px);
+      flex: 0 0 clamp(300px, 26vw, 380px); max-height: none; margin-top: clamp(40px,4vw,56px);
     }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -701,7 +708,7 @@ code, .mono {
   }
   .counter {
     display: flex; align-items: flex-start; justify-content: center;
-    gap: 0.04em; margin-top: 10px; padding: 0 2px;
+    gap: 0.04em; margin-top: 10px; padding: 0 clamp(12px, 3vw, 28px);
     font-family: var(--font-display); font-weight: 700;
     line-height: 0.86; letter-spacing: -0.01em;
     color: var(--lfg-cream);
@@ -1153,7 +1160,7 @@ code, .mono {
       </div>
 
       <div class="rates">
-        <div class="rate"><b><span id="rSec">≈ £48</span><span class="ps"> /sec</span></b><span>every second</span></div>
+        <div class="rate"><b id="rSec">≈ £48</b><span>every second</span></div>
         <div class="rate"><b id="rMin">≈ £2,850</b><span>every minute</span></div>
         <div class="rate"><b id="rHour">≈ £171,000</b><span>every hour</span></div>
       </div>
@@ -1308,7 +1315,9 @@ window.LFG = window.LFG || {};
     // font-size: one measure-and-scale pass fits exactly. We measure the
     // inline-flex children's offsetWidth (their true content width) rather than
     // counter.scrollWidth, which under-reports left overflow under justify-center.
-    var avail = counter.clientWidth - 4;
+    var cs = getComputedStyle(counter);
+    var pad = (parseFloat(cs.paddingLeft) || 0) + (parseFloat(cs.paddingRight) || 0);
+    var avail = counter.clientWidth - pad - 4;
     var MAX = 200, MIN = 30;
     counter.style.fontSize = MAX + 'px';
     var sym = counter.querySelector('.sym');

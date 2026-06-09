@@ -181,8 +181,10 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
     return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' }).toLowerCase();
   }
   function periodTime(p) {
+    // p runs 1..48; a spell's end can be 49 → end of day. Don't wrap 24:00
+    // back to 00:00, or an all-day spell reads "00:00–00:00".
     var mins = (p - 1) * 30;
-    var h = Math.floor(mins / 60) % 24, m = mins % 60;
+    var h = Math.floor(mins / 60), m = mins % 60;
     return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
   }
   // merge consecutive half-hours into readable spells: "13:30–15:30"
