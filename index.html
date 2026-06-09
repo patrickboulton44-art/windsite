@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <title>the wasted wind counter — looking for growth</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Britain is paying wind farms to switch off — and paying gas to fill the gap. See the live bill, straight from the grid's official ledger.">
+<meta name="description" content="Britain is paying wind farms to switch off — and paying gas to fill the gap. See the live bill.">
 <style>/* ============================================================
    LFG — Looking For Growth — Design Tokens
    Source of truth for colours, type and visual primitives.
@@ -630,6 +630,16 @@ code, .mono {
   @keyframes ah-in { to { opacity: 1; transform: none; } }
   .ah-day { font-family: var(--font-body); font-weight: 700; font-size: 14px; color: rgba(0,0,0,0.7); }
   .ah-amt { font-family: var(--font-display); font-weight: 700; font-size: clamp(16px,2.2vw,20px); color: var(--lfg-black); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  /* fades in a couple of seconds after the rows land */
+  .ah-cta {
+    display: inline-block; margin-top: 16px; opacity: 0;
+    font-family: var(--font-body); font-weight: 700; font-size: 14px;
+    color: var(--lfg-black); text-decoration: underline; text-underline-offset: 3px;
+    text-decoration-thickness: 2px;
+  }
+  .ah-cta span { display: inline-block; transition: transform .2s var(--ease,ease); }
+  .ah-cta:hover span { transform: translateX(4px); }
+  .with-history .ah-cta { animation: ah-in .6s var(--ease,ease) forwards; animation-delay: 2s; }
 
   @media (min-width: 880px) {
     .with-history .game-inner { width: min(100%, 1120px); }
@@ -645,8 +655,8 @@ code, .mono {
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .answer-history, .with-history .ah-row { transition: none; animation: none; }
-    .with-history .ah-row { opacity: 1; transform: none; }
+    .answer-history, .with-history .ah-row, .with-history .ah-cta { transition: none; animation: none; }
+    .with-history .ah-row, .with-history .ah-cta { opacity: 1; transform: none; }
   }
 
   /* email capture on the answer screen (cream bg) */
@@ -1129,7 +1139,7 @@ code, .mono {
         <div class="answer-main">
           <p class="a-label">you guessed</p>
           <div class="a-guess" id="aGuess">£0</div>
-          <p class="a-label">wasted this week so far — straight from the grid's ledger</p>
+          <p class="a-label">wasted this week so far</p>
           <div class="a-real"><span class="m-sym">£</span><span id="sinceAmt">0</span></div>
           <p class="a-sub">recent pace: <span id="meterRate">£47.56 a second</span> · updates every 15 minutes</p>
           <p class="verdict" id="verdict">not even close — we burns through cash faster than that.</p>
@@ -1473,7 +1483,7 @@ window.LFG = window.LFG || {};
     var frag = document.createDocumentFragment();
     var lbl = document.createElement('p');
     lbl.className = 'ah-label';
-    lbl.textContent = 'the last three days — wind off + gas on';
+    lbl.textContent = 'the last three days';
     frag.appendChild(lbl);
     rows.forEach(function (r, i) {
       var row = document.createElement('div');
@@ -1488,6 +1498,11 @@ window.LFG = window.LFG || {};
       row.appendChild(day); row.appendChild(amt);
       frag.appendChild(row);
     });
+    var cta = document.createElement('a');
+    cta.className = 'ah-cta';
+    cta.href = '/receipts.html';
+    cta.innerHTML = 'want to see the receipts? <span aria-hidden="true">→</span>';
+    frag.appendChild(cta);
     historyEl.textContent = '';
     historyEl.appendChild(frag);
   }
