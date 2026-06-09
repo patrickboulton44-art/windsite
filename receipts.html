@@ -87,15 +87,26 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
 
 #status { margin-top: 26px; font-weight: 700; color: rgba(0,0,0,0.55); }
 
-/* two-column: breakdown left, receipt right */
-.receipt-layout { display: grid; grid-template-columns: 1fr; gap: clamp(30px, 4vw, 52px); margin-top: clamp(24px, 4vw, 34px); align-items: start; }
-.rl-left { min-width: 0; }
-.rl-right { display: flex; flex-direction: column; align-items: center; gap: 14px; }
-.receipt-fit { width: 360px; max-width: 100%; transform-origin: top center; }
+/* Layout via named areas so the receipt can sit top-right on desktop but
+   between the summary and the amounts on mobile.
+   mobile order:  head → summary → receipt → cards
+   desktop:       head/summary/cards stack on the left, receipt fills the right */
+.receipt-layout {
+  display: grid; grid-template-columns: 1fr; column-gap: clamp(30px, 4vw, 52px); row-gap: 0;
+  margin-top: clamp(24px, 4vw, 34px); align-items: start;
+  grid-template-areas: "head" "summary" "receipt" "cards";
+}
+.rl-head { grid-area: head; min-width: 0; }
+.rl-summary { grid-area: summary; min-width: 0; margin-top: clamp(16px, 3vw, 24px); }
+.rl-cards { grid-area: cards; min-width: 0; }
+.rl-receipt { grid-area: receipt; display: flex; flex-direction: column; align-items: center; gap: 14px; margin: clamp(24px,5vw,30px) 0; }
+.receipt-fit { width: 360px; max-width: 100%; }
 @media (min-width: 900px) {
-  .receipt-layout { grid-template-columns: minmax(0, 1fr) 360px; }
-  /* keep buttons + the full receipt in view without scrolling to the bottom */
-  .rl-right { position: sticky; top: 72px; }
+  .receipt-layout {
+    grid-template-columns: minmax(0, 1fr) 360px;
+    grid-template-areas: "head receipt" "summary receipt" "cards receipt";
+  }
+  .rl-receipt { position: sticky; top: 72px; margin: 0; align-self: start; }
 }
 
 .summary { margin-top: 4px; }
@@ -235,24 +246,28 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
 
   <main>
     <div class="wrap">
-      <h1>the receipts</h1>
-      <p class="lede">every time a wind farm is paid to switch off, it lands on the official record. pick a day — here's who was paid, when, and how much, with the bill made out in full.</p>
-
-      <div class="day-nav">
-        <button id="prevBtn" type="button" aria-label="previous day">←</button>
-        <input type="date" id="dayPick" min="2026-01-01" aria-label="choose a day">
-        <button id="nextBtn" type="button" aria-label="next day">→</button>
-      </div>
-
-      <p id="status">loading the ledger…</p>
-
       <div class="receipt-layout">
-        <div class="rl-left">
+        <div class="rl-head">
+          <h1>the receipts</h1>
+          <p class="lede">every time a wind farm is paid to switch off, it lands on the official record. pick a day — here's who was paid, when, and how much, with the bill made out in full.</p>
+
+          <div class="day-nav">
+            <button id="prevBtn" type="button" aria-label="previous day">←</button>
+            <input type="date" id="dayPick" min="2026-01-01" aria-label="choose a day">
+            <button id="nextBtn" type="button" aria-label="next day">→</button>
+          </div>
+
+          <p id="status">loading the ledger…</p>
+        </div>
+
+        <div class="rl-summary" id="summary"></div>
+
+        <div class="rl-cards">
           <div id="content"></div>
           <p class="worst" id="worst" hidden></p>
         </div>
 
-        <aside class="rl-right" id="receiptCol" hidden>
+        <aside class="rl-receipt" id="receiptCol" hidden>
           <div class="receipt-actions">
             <button class="r-btn" id="dlBtn" type="button">⬇ download</button>
             <button class="r-btn secondary" id="xBtn" type="button">share → X</button>
@@ -331,6 +346,7 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
     var next = document.getElementById('nextBtn');
     var statusEl = document.getElementById('status');
     var content = document.getElementById('content');
+    var summaryEl = document.getElementById('summary');
     var worstEl = document.getElementById('worst');
     var receiptCol = document.getElementById('receiptCol');
     var receiptWrap = document.getElementById('receiptWrap');
@@ -395,30 +411,10 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
       receipt.querySelector('.r-date').textContent = shortDate(d.date) + (d.isToday ? ' (so far)' : '');
       recalcReceipt();
       receiptCol.hidden = false;
-      fitReceipt();
     }
-    // on desktop, shrink the receipt just enough that the whole thing — and
-    // the buttons above it — fit on screen without scrolling to the bottom
-    function fitReceipt() {
-      receiptFit.style.transform = '';
-      receiptFit.style.marginBottom = '';
-      if (window.innerWidth < 900) return;
-      var h = receiptWrap.offsetHeight;
-      if (!h) return;
-      // room the receipt has once the column is stuck: viewport minus the
-      // sticky offset, the buttons/hint above it, and a little breathing room
-      var stickyTop = 72, above = receiptFit.offsetTop;
-      var avail = window.innerHeight - stickyTop - above - 24;
-      var scale = Math.max(0.5, Math.min(1, avail / h));
-      if (scale < 1) {
-        receiptFit.style.transform = 'scale(' + scale + ')';
-        receiptFit.style.marginBottom = (-(1 - scale) * h) + 'px'; // collapse the freed space
-      }
-    }
-    window.addEventListener('resize', fitReceipt);
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitReceipt);
 
     function render(d) {
+      summaryEl.textContent = '';
       content.textContent = '';
       statusEl.hidden = true;
       fillReceipt(d);
@@ -431,8 +427,8 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
         z.appendChild(document.createTextNode('£0 — nothing wasted. the grid carried '));
         z.appendChild(el('span', '', 'every megawatt'));
         z.appendChild(document.createTextNode(' of wind this day. it can be done.'));
-        content.appendChild(sum);
-        content.appendChild(z);
+        sum.appendChild(z);
+        summaryEl.appendChild(sum);
       } else {
         var dayTotal = d.switchOffCost + d.replaceCost;
         var amountWrap = el('div', 'sum-amount');
@@ -447,7 +443,7 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
           Math.round(d.curtailedMWh).toLocaleString('en-GB') + ' MWh thrown away — plus ' +
           gbp(d.replaceCost) + ' buying it back from the generators below.' + (d.isToday ? ' (so far today.)' : '');
         sum.appendChild(el('p', 'sum-sub', subBits));
-        content.appendChild(sum);
+        summaryEl.appendChild(sum);
 
         function plantCard(f, stackType, detailText) {
           var ledger = 'https://data.elexon.co.uk/bmrs/api/v1/balancing/settlement/stack/all/' + stackType + '/' + d.date + '/' + f.periods[0];
@@ -514,6 +510,7 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
       next.disabled = date >= today;
       statusEl.hidden = false;
       statusEl.textContent = 'reading the ledger…';
+      summaryEl.textContent = '';
       content.textContent = '';
       worstEl.hidden = true;
       history.replaceState(null, '', '?date=' + date);
