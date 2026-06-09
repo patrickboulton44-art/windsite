@@ -598,6 +598,46 @@ code, .mono {
     margin: clamp(24px,4.5vh,38px) auto 0; max-width: 20ch; text-wrap: balance;
   }
 
+  /* answer + the seven-day history panel that slides in beside it */
+  .answer { display: flex; flex-direction: column; align-items: center; }
+  .answer-main { width: 100%; max-width: 600px; }
+  .answer-history {
+    width: 100%; max-width: 460px; opacity: 0; max-height: 0; overflow: hidden;
+    margin-top: 0; text-align: left;
+    transition: opacity .6s ease, max-height .8s var(--ease,ease), margin-top .6s var(--ease,ease);
+  }
+  .with-history .answer-history { opacity: 1; max-height: 680px; margin-top: clamp(30px,5vh,44px); }
+  .ah-label {
+    font-family: var(--font-body); font-weight: 700; font-size: clamp(11px,1.6vw,13px);
+    letter-spacing: 0.14em; text-transform: uppercase; color: rgba(0,0,0,0.6); margin: 0 0 14px;
+  }
+  .ah-row {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 14px;
+    padding: 11px 0; border-top: 1px solid rgba(0,0,0,0.16);
+    opacity: 0; transform: translateX(14px);
+  }
+  .ah-row:last-child { border-bottom: 1px solid rgba(0,0,0,0.16); }
+  .with-history .ah-row { animation: ah-in .5s var(--ease,ease) forwards; animation-delay: calc(.25s + var(--i) * .07s); }
+  @keyframes ah-in { to { opacity: 1; transform: none; } }
+  .ah-day { font-family: var(--font-body); font-weight: 700; font-size: 14px; color: rgba(0,0,0,0.7); }
+  .ah-amt { font-family: var(--font-display); font-weight: 700; font-size: clamp(16px,2.2vw,20px); color: var(--lfg-black); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  @media (min-width: 880px) {
+    .with-history .game-inner { width: min(100%, 1120px); }
+    .with-history .answer { flex-direction: row; align-items: flex-start; justify-content: center; gap: clamp(40px,5vw,72px); }
+    .with-history .answer-main { text-align: left; flex: 0 1 600px; }
+    .with-history .answer-main .a-guess,
+    .with-history .answer-main .verdict { margin-left: 0; margin-right: auto; }
+    .with-history .answer-main .ask { margin-left: 0; }
+    .with-history .answer-history {
+      flex: 0 0 auto; max-height: none; margin-top: clamp(40px,4vw,56px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .answer-history, .with-history .ah-row { transition: none; animation: none; }
+    .with-history .ah-row { opacity: 1; transform: none; }
+  }
+
   /* email capture on the answer screen (cream bg) */
   .ask { margin: clamp(26px,4.5vh,40px) auto 0; max-width: 460px; }
   .ask-line {
@@ -1075,22 +1115,25 @@ code, .mono {
 
       <!-- answer -->
       <div class="answer" id="answer" hidden="">
-        <p class="a-label">you guessed</p>
-        <div class="a-guess" id="aGuess">£0</div>
-        <p class="a-label">wasted this week so far — straight from the grid's ledger</p>
-        <div class="a-real"><span class="m-sym">£</span><span id="sinceAmt">0</span></div>
-        <p class="a-sub">recent pace: <span id="meterRate">£47.56 a second</span> · updates every 15 minutes</p>
-        <p class="verdict" id="verdict">not even close — we burns through cash faster than that.</p>
+        <div class="answer-main">
+          <p class="a-label">you guessed</p>
+          <div class="a-guess" id="aGuess">£0</div>
+          <p class="a-label">wasted this week so far — straight from the grid's ledger</p>
+          <div class="a-real"><span class="m-sym">£</span><span id="sinceAmt">0</span></div>
+          <p class="a-sub">recent pace: <span id="meterRate">£47.56 a second</span> · updates every 15 minutes</p>
+          <p class="verdict" id="verdict">not even close — we burns through cash faster than that.</p>
 
-        <form class="ask" id="emailForm">
-          <p class="ask-line">the bill keeps climbing until we make them fix the grid. <strong>we're the campaign forcing it. join us.</strong></p>
-          <div class="ask-row">
-            <input type="email" id="emailInput" required="" placeholder="you@email.com" aria-label="Your email address">
-            <button type="submit">i'm in <span class="go" aria-hidden="true">→</span></button>
-          </div>
-          <p class="ask-privacy">campaign updates only — see our <a href="https://lookingforgrowth.uk/privacy-policy/" target="_blank" rel="noopener">privacy policy</a>.</p>
-          <button class="ask-skip" id="continueBtn" type="button">Why is this happening?</button>
-        </form>
+          <form class="ask" id="emailForm">
+            <p class="ask-line">the bill keeps climbing until we make them fix the grid. <strong>we're the campaign forcing it. join us.</strong></p>
+            <div class="ask-row">
+              <input type="email" id="emailInput" required="" placeholder="you@email.com" aria-label="Your email address">
+              <button type="submit">i'm in <span class="go" aria-hidden="true">→</span></button>
+            </div>
+            <p class="ask-privacy">campaign updates only — see our <a href="https://lookingforgrowth.uk/privacy-policy/" target="_blank" rel="noopener">privacy policy</a>.</p>
+            <button class="ask-skip" id="continueBtn" type="button">Why is this happening?</button>
+          </form>
+        </div>
+        <aside class="answer-history" id="answerHistory" aria-hidden="true"></aside>
       </div>
 
       <p class="game-note"><em>live grid data from Elexon, the official record of Britain's electricity market.</em></p>
@@ -1403,6 +1446,52 @@ window.LFG = window.LFG || {};
   var verdictEl = document.getElementById('verdict');
   var revealBtn = document.getElementById('revealBtn');
 
+  // ---- seven-day history panel: last 7 settled days, combined cost
+  // (wind switch-off + replacement power), slides in beside the answer ----
+  var historyEl = document.getElementById('answerHistory');
+  var history7 = null;
+  var wantHistory = false;
+  function dayLabel(iso) {
+    var d = new Date(iso + 'T12:00:00Z');
+    return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' }).toLowerCase();
+  }
+  function buildHistory(rows) {
+    if (!historyEl) return;
+    var frag = document.createDocumentFragment();
+    var lbl = document.createElement('p');
+    lbl.className = 'ah-label';
+    lbl.textContent = 'the last seven days — wind off + gas on';
+    frag.appendChild(lbl);
+    rows.forEach(function (r, i) {
+      var row = document.createElement('div');
+      row.className = 'ah-row';
+      row.style.setProperty('--i', i);
+      var day = document.createElement('span');
+      day.className = 'ah-day';
+      day.textContent = r.label;
+      var amt = document.createElement('span');
+      amt.className = 'ah-amt';
+      amt.textContent = '£' + Math.round(r.total).toLocaleString('en-GB');
+      row.appendChild(day); row.appendChild(amt);
+      frag.appendChild(row);
+    });
+    historyEl.textContent = '';
+    historyEl.appendChild(frag);
+  }
+  function maybeShowHistory() {
+    if (wantHistory && history7 && history7.length) game.classList.add('with-history');
+  }
+  fetch('/data/wasted-daily.json').then(function (r) {
+    return r.ok ? r.json() : null;
+  }).then(function (data) {
+    if (!Array.isArray(data) || !data.length) return;
+    history7 = data.slice(-7).map(function (r) {
+      return { label: dayLabel(r.date), total: (r.switchOffCost || 0) + (r.replaceCost || 0) };
+    });
+    buildHistory(history7);
+    maybeShowHistory();
+  }).catch(function () { /* no panel if the data file is unreachable */ });
+
   function verdict(guess, real) {
     if (real <= 0) return 'the week\u2019s just begun \u2014 and it\u2019s already started.';
     if (guess === 0) return 'zero? if only. it never stops.';
@@ -1426,6 +1515,9 @@ window.LFG = window.LFG || {};
     quiz.setAttribute('hidden', '');
     answer.removeAttribute('hidden');
     game.classList.add('revealed', 'answered');
+    // a beat later, shift the answer left and slide the seven-day panel in
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    setTimeout(function () { wantHistory = true; maybeShowHistory(); }, reduce ? 0 : 1000);
     // stay locked — the user advances with the button, not by scrolling
   }
   if (revealBtn) revealBtn.addEventListener('click', reveal);

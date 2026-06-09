@@ -219,19 +219,20 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
       content.appendChild(sum);
       content.appendChild(z);
     } else {
-      // the headline amount links to the raw data behind it
+      // the headline is the combined cost — wind paid to switch off PLUS the
+      // gas (and other) generators paid to fill the gap — linking to the data
+      var dayTotal = d.switchOffCost + d.replaceCost;
       var amountWrap = el('div', 'sum-amount');
-      var amountLink = el('a', '', gbp(d.switchOffCost));
+      var amountLink = el('a', '', gbp(dayTotal));
       amountLink.href = '/api/receipts?date=' + d.date;
       amountLink.target = '_blank'; amountLink.rel = 'noopener';
       amountLink.title = 'open the raw data behind this number';
       amountWrap.appendChild(amountLink);
       sum.appendChild(amountWrap);
-      var subBits = 'paid to switch wind farms off — ' + d.paymentCount + ' payment' + (d.paymentCount === 1 ? '' : 's') +
+      var subBits = gbp(d.switchOffCost) + ' to switch wind farms off — ' + d.paymentCount + ' payment' + (d.paymentCount === 1 ? '' : 's') +
         ' to ' + d.farmCount + ' farm' + (d.farmCount === 1 ? '' : 's') + ', ' +
-        Math.round(d.curtailedMWh).toLocaleString('en-GB') + ' MWh thrown away.' +
-        ' buying that energy back cost another ' + gbp(d.replaceCost) +
-        ' — day total ' + gbp(d.switchOffCost + d.replaceCost) + (d.isToday ? ' so far' : '') + '.';
+        Math.round(d.curtailedMWh).toLocaleString('en-GB') + ' MWh thrown away — plus ' +
+        gbp(d.replaceCost) + ' buying it back from the generators below.' + (d.isToday ? ' (so far today.)' : '');
       var sub = el('p', 'sum-sub');
       sub.textContent = subBits;
       sum.appendChild(sub);
