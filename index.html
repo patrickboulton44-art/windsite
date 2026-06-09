@@ -487,7 +487,7 @@ code, .mono {
 
   /* button-triggered page transition: the game fades out, the rest fades on,
      no scroll jump. */
-  section.game { transition: opacity 480ms ease; }
+  section.game { transition: opacity 480ms ease, background-color 1400ms ease; }
   section.game.dismissed { opacity: 0; pointer-events: none; }
   #mainContent { opacity: 0; }
   #mainContent.shown { opacity: 1; transition: opacity 760ms ease; }
@@ -500,15 +500,15 @@ code, .mono {
     /* when the answer + panel is taller than the screen, 'safe' falls back to
        top-alignment so the top stays scroll-reachable (plain 'center' clips it) */
     align-items: safe center;
-    background: var(--lfg-cream); color: var(--lfg-black);
+    background-color: var(--lfg-cream); color: var(--lfg-black);
     padding: clamp(84px, 13vh, 130px) 20px clamp(40px, 8vh, 80px);
     overflow: hidden;
   }
-  .game-bg {
-    position: absolute; inset: 0; background: var(--lfg-orange);
-    opacity: 0; transition: opacity 1600ms ease; pointer-events: none;
-  }
-  section.game.revealed .game-bg { opacity: 1; }
+  /* orange is the section's own background-colour so it fills the entire
+     scroll area — an absolutely-positioned layer only covered the first
+     screenful and left a cream gap once the panel pushed content taller */
+  section.game.revealed { background-color: var(--lfg-orange); }
+  .game-bg { display: none; }
   .game-inner { position: relative; width: min(100%, 880px); text-align: center; }
 
   /* question */
@@ -587,6 +587,7 @@ code, .mono {
     font-family: var(--font-display); font-weight: 700; letter-spacing: -0.02em;
     font-size: clamp(46px,12vw,128px); line-height: 0.88; color: var(--lfg-black);
     margin-top: 8px; font-variant-numeric: tabular-nums; white-space: nowrap;
+    transition: font-size .7s cubic-bezier(.25,.7,.3,1);
   }
   .a-real .m-sym { margin-right: 0.03em; }
   /* on phones the long ledger figure was kissing both edges — size it to fit */
@@ -1488,8 +1489,25 @@ window.LFG = window.LFG || {};
     historyEl.textContent = '';
     historyEl.appendChild(frag);
   }
+  var answerMain = answer.querySelector('.answer-main');
   function maybeShowHistory() {
-    if (wantHistory && history7 && history7.length) game.classList.add('with-history');
+    if (!(wantHistory && history7 && history7.length)) return;
+    if (game.classList.contains('with-history')) return;
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce || !answerMain) { game.classList.add('with-history'); return; }
+    // FLIP: note where the answer sits now (centred), flip to the two-column
+    // layout, then glide it from the old spot to its new leftward home so the
+    // big number visibly slides left as the panel arrives.
+    var first = answerMain.getBoundingClientRect().left;
+    game.classList.add('with-history');
+    var dx = first - answerMain.getBoundingClientRect().left;
+    if (Math.abs(dx) < 2) return; // mobile stacks below — no sideways move
+    answerMain.style.transition = 'none';
+    answerMain.style.transform = 'translateX(' + dx + 'px)';
+    void answerMain.offsetWidth; // commit the start position before animating
+    answerMain.style.transition = 'transform .7s cubic-bezier(.25,.7,.3,1)';
+    answerMain.style.transform = 'translateX(0)';
+    setTimeout(function () { answerMain.style.transition = ''; answerMain.style.transform = ''; }, 760);
   }
   fetch('/data/wasted-daily.json').then(function (r) {
     return r.ok ? r.json() : null;
