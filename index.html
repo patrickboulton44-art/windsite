@@ -1461,7 +1461,7 @@ window.LFG = window.LFG || {};
     var frag = document.createDocumentFragment();
     var lbl = document.createElement('p');
     lbl.className = 'ah-label';
-    lbl.textContent = 'the last seven days — wind off + gas on';
+    lbl.textContent = 'the last three days — wind off + gas on';
     frag.appendChild(lbl);
     rows.forEach(function (r, i) {
       var row = document.createElement('div');
@@ -1486,7 +1486,7 @@ window.LFG = window.LFG || {};
     return r.ok ? r.json() : null;
   }).then(function (data) {
     if (!Array.isArray(data) || !data.length) return;
-    history7 = data.slice(-7).map(function (r) {
+    history7 = data.slice(-3).map(function (r) {
       return { label: dayLabel(r.date), total: (r.switchOffCost || 0) + (r.replaceCost || 0) };
     });
     buildHistory(history7);
