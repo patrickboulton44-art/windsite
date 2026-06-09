@@ -640,11 +640,13 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
     document.getElementById('dlBtn').addEventListener('click', function () { downloadImage(); });
 
     document.getElementById('xBtn').addEventListener('click', function () {
-      if (supportsFileShare()) { shareFile(); return; }
-      // desktop: open the tweet NOW (inside the click, so it isn't popup-blocked),
-      // then render the image so they can attach it
-      window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(tweetText()) + '&url=' + encodeURIComponent(pageUrl()), '_blank', 'noopener');
-      downloadImage('tweet opened — attach the downloaded receipt image.');
+      // always open X's tweet composer directly, synchronously inside the click
+      // (so it isn't popup-blocked and doesn't get lost behind an async share sheet),
+      // then render the image so it can be attached
+      var url = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(tweetText()) + '&url=' + encodeURIComponent(pageUrl());
+      var w = window.open(url, '_blank', 'noopener,noreferrer');
+      downloadImage(w ? 'tweet opened — attach the downloaded receipt image.'
+                      : 'allow pop-ups to open X — your receipt image has been saved to attach.');
     });
 
     document.getElementById('igBtn').addEventListener('click', function () {
