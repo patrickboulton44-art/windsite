@@ -647,6 +647,13 @@ code, .mono {
   .ah-cta:hover span { transform: translateX(4px); }
   .with-history .ah-cta { animation: ah-in .6s var(--ease,ease) forwards; animation-delay: 1s; }
 
+  /* mobile: slot the three-day panel between the verdict and the email form
+     (panel keeps its fade/expand; the email keeps its reveal fade) */
+  @media (max-width: 879px) {
+    .answer-main { display: contents; }
+    .answer-history { order: 1; }
+    .answer-main .ask { order: 2; }
+  }
   @media (min-width: 880px) {
     .with-history .game-inner { width: min(100%, 1120px); }
     .with-history .answer { flex-direction: row; align-items: flex-start; justify-content: center; gap: clamp(40px,5vw,72px); }
