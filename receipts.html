@@ -298,12 +298,12 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
               <div class="brandbar" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
               <p class="r-wordmark">looking for growth<span class="uk">.uk</span></p>
 
-              <h1 class="headline">we switched off<br>the <span class="hot">wind.</span></h1>
+              <h1 class="headline">we didn't build infrastructure.<br>now <span class="hot">you</span> have to <span class="hot">pay</span></h1>
               <p class="subhead">we fired up the gas instead — and billpayers covered both. here's the receipt. please pay NOW.</p>
 
               <div class="meta">
                 <div class="row"><span>date</span><span class="r-date">—</span></div>
-                <div class="row"><span>issued by</span><span>poor grid &amp; planning</span></div>
+                <div class="row"><span>issued by</span><span>successive governments</span></div>
                 <div class="row"><span>ref</span><span>#NO-2-WIND</span></div>
                 <div class="row"><span>paid by</span><span>you</span></div>
               </div>
@@ -449,9 +449,8 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
 
       if (d.farmCount === 0) {
         var z = el('div', 'zero');
-        z.appendChild(document.createTextNode('£0 — nothing wasted. the grid carried '));
-        z.appendChild(el('span', '', 'every megawatt'));
-        z.appendChild(document.createTextNode(' of wind this day. it can be done.'));
+        z.appendChild(document.createTextNode('£0 — '));
+        z.appendChild(el('span', '', 'it can be done.'));
         sum.appendChild(z);
         summaryEl.appendChild(sum);
         revealToggle.hidden = true;
