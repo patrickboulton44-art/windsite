@@ -1404,9 +1404,9 @@ window.LFG = window.LFG || {};
   var sinceEl = document.getElementById('sinceAmt');
   function tick() {
     if (sinceEl) {
-      var v = window.LFG.weekWasted(loadT);
-      var dp = (window.LFG && window.LFG.pennies === false) ? 0 : 2;
-      sinceEl.textContent = v.toLocaleString('en-GB', { minimumFractionDigits: dp, maximumFractionDigits: dp });
+      // whole pounds, rounded down — a seven-figure total with pence reads fussy
+      var v = Math.floor(window.LFG.weekWasted(loadT));
+      sinceEl.textContent = v.toLocaleString('en-GB');
     }
     requestAnimationFrame(tick);
   }
