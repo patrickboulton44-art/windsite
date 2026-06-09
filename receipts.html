@@ -112,10 +112,21 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
 .summary { margin-top: 4px; }
 .sum-label { font-weight: 700; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(0,0,0,0.62); }
 .sum-amount { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.02em; font-size: clamp(40px, 8vw, 76px); line-height: 1; margin-top: 6px; }
-.sum-amount a { color: inherit; text-decoration: none; border-bottom: 4px solid var(--lfg-orange); transition: border-color .2s var(--ease), color .2s var(--ease); }
-.sum-amount a:hover { color: var(--lfg-orange-deep); border-color: var(--lfg-orange-deep); }
+.sum-num { display: inline-block; border-bottom: 4px solid var(--lfg-orange); line-height: 0.92; }
 .sum-sub { font-weight: 500; font-size: 15px; color: rgba(0,0,0,0.65); margin-top: 12px; line-height: 1.55; max-width: 56ch; }
 .sum-sub strong { color: var(--lfg-black); }
+
+/* collapsible breakdown */
+.reveal-toggle {
+  display: inline-flex; align-items: center; gap: 9px; cursor: pointer;
+  margin-top: clamp(22px, 4vw, 32px);
+  font-family: var(--font-body); font-weight: 700; font-size: 15px;
+  background: var(--lfg-black); color: var(--lfg-cream); border: 2px solid var(--lfg-black);
+  padding: 14px 22px; transition: background .2s var(--ease), color .2s var(--ease), border-color .2s var(--ease);
+}
+.reveal-toggle:hover { background: var(--lfg-orange); border-color: var(--lfg-orange); color: var(--lfg-black); }
+.reveal-toggle span { transition: transform .2s var(--ease); }
+.reveal-toggle[aria-expanded="true"] span { transform: rotate(180deg); }
 
 .farm {
   margin-top: 14px; background: var(--lfg-black); color: var(--lfg-cream);
@@ -263,7 +274,8 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
         <div class="rl-summary" id="summary"></div>
 
         <div class="rl-cards">
-          <div id="content"></div>
+          <button class="reveal-toggle" id="revealToggle" type="button" aria-expanded="false" hidden>see where your money went <span aria-hidden="true">↓</span></button>
+          <div id="content" hidden></div>
           <p class="worst" id="worst" hidden></p>
         </div>
 
@@ -347,6 +359,13 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
     var statusEl = document.getElementById('status');
     var content = document.getElementById('content');
     var summaryEl = document.getElementById('summary');
+    var revealToggle = document.getElementById('revealToggle');
+    function setReveal(open) {
+      content.hidden = !open;
+      revealToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      revealToggle.firstChild.textContent = open ? 'hide the breakdown ' : 'see where your money went ';
+    }
+    revealToggle.addEventListener('click', function () { setReveal(content.hidden); });
     var worstEl = document.getElementById('worst');
     var receiptCol = document.getElementById('receiptCol');
     var receiptWrap = document.getElementById('receiptWrap');
@@ -429,19 +448,17 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
         z.appendChild(document.createTextNode(' of wind this day. it can be done.'));
         sum.appendChild(z);
         summaryEl.appendChild(sum);
+        revealToggle.hidden = true;
+        content.hidden = true;
       } else {
         var dayTotal = d.switchOffCost + d.replaceCost;
         var amountWrap = el('div', 'sum-amount');
-        var amountLink = el('a', '', gbp(dayTotal));
-        amountLink.href = '/api/receipts?date=' + d.date;
-        amountLink.target = '_blank'; amountLink.rel = 'noopener';
-        amountLink.title = 'open the raw data behind this number';
-        amountWrap.appendChild(amountLink);
+        amountWrap.appendChild(el('span', 'sum-num', gbp(dayTotal)));
         sum.appendChild(amountWrap);
         var subBits = gbp(d.switchOffCost) + ' to switch wind farms off — ' + d.paymentCount + ' payment' + (d.paymentCount === 1 ? '' : 's') +
           ' to ' + d.farmCount + ' farm' + (d.farmCount === 1 ? '' : 's') + ', ' +
           Math.round(d.curtailedMWh).toLocaleString('en-GB') + ' MWh thrown away — plus ' +
-          gbp(d.replaceCost) + ' buying it back from the generators below.' + (d.isToday ? ' (so far today.)' : '');
+          gbp(d.replaceCost) + ' buying it back from gas and other generators.' + (d.isToday ? ' (so far today.)' : '');
         sum.appendChild(el('p', 'sum-sub', subBits));
         summaryEl.appendChild(sum);
 
@@ -489,6 +506,8 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
               ' — ' + Math.round(f.mwh).toLocaleString('en-GB') + ' MWh of replacement power.'));
           });
         }
+        revealToggle.hidden = false;
+        setReveal(false); // start collapsed each day
       }
 
       if (d.worstDay && d.worstDay.date !== d.date) {
@@ -512,6 +531,7 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
       statusEl.textContent = 'reading the ledger…';
       summaryEl.textContent = '';
       content.textContent = '';
+      revealToggle.hidden = true;
       worstEl.hidden = true;
       history.replaceState(null, '', '?date=' + date);
       fetch('/api/receipts?date=' + date).then(function (r) {
