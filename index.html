@@ -1031,11 +1031,26 @@ code, .mono {
     display: flex; flex-wrap: wrap; gap: 14px 32px;
     align-items: flex-end; justify-content: space-between;
   }
+  .foot-brand-wrap { display: inline-block; }
+  /* horizontal colour bars above the footer logo, stretching to the logo's width */
+  .foot-motif { display: flex; flex-direction: column; gap: 3px; width: 100%; margin-bottom: 14px; }
+  .foot-motif span { display: block; height: 5px; transform-origin: left center; }
+  .foot-motif span:nth-child(1){ width: 60%; background: var(--lfg-yellow); }
+  .foot-motif span:nth-child(2){ width: 100%; background: var(--lfg-orange-deep); }
+  .foot-motif span:nth-child(3){ width: 78%; background: var(--lfg-blue); }
+  .foot-motif span:nth-child(4){ width: 28%; background: var(--lfg-cream); }
   .foot-brand {
+    display: inline-block; text-decoration: none;
     font-family: var(--font-display); font-weight: 700; text-transform: lowercase;
     font-size: 26px; line-height: 0.92; letter-spacing: -0.03em; color: var(--lfg-cream);
   }
   .foot-brand .tld { font-size: 15px; color: var(--lfg-orange); }
+  /* hover the logo → the bars do the equaliser ripple (bars themselves aren't links) */
+  .foot-brand-wrap:hover .foot-motif span { animation: eq-bounce .6s ease-in-out infinite; }
+  .foot-brand-wrap:hover .foot-motif span:nth-child(2){ animation-delay: .12s; }
+  .foot-brand-wrap:hover .foot-motif span:nth-child(3){ animation-delay: .24s; }
+  .foot-brand-wrap:hover .foot-motif span:nth-child(4){ animation-delay: .36s; }
+  @media (prefers-reduced-motion: reduce) { .foot-brand-wrap:hover .foot-motif span { animation: none; } }
   .foot-note { font-family: var(--font-body); font-size: 12px; color: rgba(235,227,208,0.55); max-width: 48ch; line-height: 1.5; }
 
   /* ---------------- INTRO — "lost in the wind" ---------------- */
@@ -1248,7 +1263,10 @@ code, .mono {
     <div class="crest" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
     <div class="wrap">
       <div class="foot-bottom">
-        <div class="foot-brand">looking<br>for<br>growth<span class="tld">.uk</span></div>
+        <div class="foot-brand-wrap">
+          <span class="foot-motif" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+          <a class="foot-brand" href="https://lookingforgrowth.uk" target="_blank" rel="noopener">looking<br>for<br>growth<span class="tld">.uk</span></a>
+        </div>
         <div class="foot-note"></div>
       </div>
     </div>
