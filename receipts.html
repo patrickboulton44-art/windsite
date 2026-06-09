@@ -59,13 +59,18 @@ nav.top .wrap { height: 60px; display: flex; align-items: center; justify-conten
   text-decoration-color: var(--lfg-orange); text-underline-offset: 3px;
 }
 .nav-link:hover { color: var(--lfg-black); }
-.nav-motif { display: flex; flex-direction: column; gap: 3px; width: 76px; transition: opacity .2s var(--ease); }
-.nav-motif:hover { opacity: 0.72; }
-.nav-motif span { display: block; height: 4px; }
+.nav-motif { display: flex; flex-direction: column; gap: 3px; width: 76px; }
+.nav-motif span { display: block; height: 4px; transform-origin: left center; }
 .nav-motif span:nth-child(1){ width: 72%; background: var(--lfg-yellow); }
 .nav-motif span:nth-child(2){ width: 96%; background: var(--lfg-orange-deep); }
 .nav-motif span:nth-child(3){ width: 84%; background: var(--lfg-blue); }
 .nav-motif span:nth-child(4){ width: 28%; background: var(--lfg-black); }
+/* hover: bars pulse their width left-to-right like a music equaliser */
+.nav-motif:hover span { animation: eq-bounce .6s ease-in-out infinite; }
+.nav-motif:hover span:nth-child(2){ animation-delay: .12s; }
+.nav-motif:hover span:nth-child(3){ animation-delay: .24s; }
+.nav-motif:hover span:nth-child(4){ animation-delay: .36s; }
+@keyframes eq-bounce { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(0.45); } }
 
 main { padding: clamp(40px, 7vw, 72px) 0 80px; }
 h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowercase; letter-spacing: -0.02em; font-size: clamp(38px, 7vw, 64px); line-height: 1; }
@@ -238,7 +243,7 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
 .r-hint { font-size: 12px; color: rgba(0,0,0,0.58); text-align: center; min-height: 1.2em; max-width: 360px; line-height: 1.4; }
 
 @media (prefers-reduced-motion: reduce) {
-  .nav-motif { transition: none; }
+  .nav-motif:hover span { animation: none; }
 }
 </style>
 </head>
