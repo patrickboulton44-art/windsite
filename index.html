@@ -600,6 +600,7 @@ code, .mono {
 
   /* answer + the seven-day history panel that slides in beside it */
   .answer { display: flex; flex-direction: column; align-items: center; }
+  .answer[hidden] { display: none; } /* keep hidden until the guess is locked in */
   .answer-main { width: 100%; max-width: 600px; }
   .answer-history {
     width: 100%; max-width: 460px; opacity: 0; max-height: 0; overflow: hidden;
