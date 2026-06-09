@@ -36,8 +36,8 @@ module.exports = async function handler(req, res) {
   }
 
   // Tag which form the signup came from.
-  var source = body.source === 'guess-game' || body.source === 'cta-footer'
-    ? body.source : 'unknown';
+  var ALLOWED = ['guess-game', 'cta-footer', 'receipts'];
+  var source = ALLOWED.indexOf(body.source) !== -1 ? body.source : 'unknown';
 
   var payload = {
     email: email,

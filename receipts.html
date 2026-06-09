@@ -111,7 +111,7 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
 }
 @media (max-width: 899px) {
   .rl-left { display: contents; }
-  .rl-head { order: 1; } .rl-summary { order: 2; } .rl-receipt { order: 3; } .rl-cards { order: 4; }
+  .rl-head { order: 1; } .rl-summary { order: 2; } .rc-signup { order: 3; } .rl-receipt { order: 4; } .rl-cards { order: 5; }
 }
 
 .summary { margin-top: 4px; }
@@ -132,6 +132,29 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
 .reveal-toggle:hover { background: var(--lfg-orange); border-color: var(--lfg-orange); color: var(--lfg-black); }
 .reveal-toggle span { transition: transform .2s var(--ease); }
 .reveal-toggle[aria-expanded="true"] span { transform: rotate(180deg); }
+
+/* email signup on the receipts page */
+.rc-signup { margin-top: clamp(22px, 4vw, 30px); max-width: 470px; }
+.rc-line { font-family: var(--font-body); font-weight: 500; font-size: clamp(14px, 1.8vw, 16px); line-height: 1.45; color: rgba(0,0,0,0.72); margin: 0 0 14px; text-wrap: balance; }
+.rc-line strong { font-weight: 700; color: var(--lfg-black); }
+.rc-row { display: flex; gap: 10px; }
+.rc-row input { flex: 1; min-width: 0; font: inherit; font-size: 16px; background: var(--lfg-cream); color: var(--lfg-black); border: 2px solid var(--lfg-black); padding: 13px 14px; }
+.rc-row input::placeholder { color: rgba(0,0,0,0.42); }
+.rc-row input:focus { outline: none; border-color: var(--lfg-orange); }
+.rc-row button { flex-shrink: 0; cursor: pointer; font-family: var(--font-body); font-weight: 700; font-size: 16px; background: var(--lfg-black); color: var(--lfg-cream); border: 2px solid var(--lfg-black); padding: 13px 20px; display: inline-flex; align-items: center; gap: 7px; transition: background .2s var(--ease), color .2s var(--ease), border-color .2s var(--ease); }
+.rc-row button:hover:enabled { background: var(--lfg-orange); border-color: var(--lfg-orange); color: var(--lfg-black); }
+.rc-row button:disabled { opacity: 0.55; cursor: wait; }
+.rc-row button .go { display: inline-block; animation: rc-wiggle 1.5s ease-in-out infinite; }
+@keyframes rc-wiggle { 0%, 100% { transform: translateX(0); } 30% { transform: translateX(-3px); } 65% { transform: translateX(4px); } }
+.rc-privacy { font-family: var(--font-body); font-weight: 500; font-size: 12px; color: rgba(0,0,0,0.5); margin: 10px 0 0; }
+.rc-privacy a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.rc-privacy a:hover { color: var(--lfg-black); }
+.rc-err { font-family: var(--font-body); font-weight: 700; font-size: 13px; color: #b3400f; margin: 10px 0 0; }
+.rc-done { font-family: var(--font-display); font-weight: 700; text-transform: lowercase; letter-spacing: -0.02em; font-size: clamp(20px, 3vw, 26px); line-height: 1.1; }
+.rc-done span { color: var(--lfg-orange); }
+.rc-sent { font-family: var(--font-body); font-weight: 500; font-size: 14px; color: rgba(0,0,0,0.6); margin: 8px 0 0; }
+@media (max-width: 520px) { .rc-row { flex-direction: column; } }
+@media (prefers-reduced-motion: reduce) { .rc-row button .go { animation: none; } }
 
 .farm {
   margin-top: 14px; background: var(--lfg-black); color: var(--lfg-cream);
@@ -278,6 +301,15 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
 
         <div class="rl-summary" id="summary"></div>
 
+        <form class="rc-signup" id="rcEmailForm">
+          <p class="rc-line">the bill keeps climbing until we make them fix the grid. <strong>we're the campaign forcing it. join us.</strong></p>
+          <div class="rc-row">
+            <input type="email" id="rcEmailInput" required placeholder="you@email.com" aria-label="Your email address">
+            <button type="submit">i'm in <span class="go" aria-hidden="true">→</span></button>
+          </div>
+          <p class="rc-privacy">campaign updates only — see our <a href="https://lookingforgrowth.uk/privacy-policy/" target="_blank" rel="noopener">privacy policy</a>.</p>
+        </form>
+
         <div class="rl-cards">
           <button class="reveal-toggle" id="revealToggle" type="button" aria-expanded="false" hidden>see where your money went <span aria-hidden="true">↓</span></button>
           <div id="content" hidden></div>
@@ -314,7 +346,7 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
               <div class="line wind" data-amount="0">
                 <div class="desc">
                   <div class="item">Wind Farms</div>
-                  <div class="note">paid to switch off — clean power we chose not to use (constraint payments)</div>
+                  <div class="note">paid to switch off — power we chose not to use (constraint payments)</div>
                 </div>
                 <div class="amt"></div>
               </div>
@@ -620,6 +652,39 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
       // desktop: Instagram has no web upload — save the image to post manually
       downloadImage('receipt saved — open Instagram and upload it.');
     });
+
+    // ---- email signup (→ Brevo via /api/subscribe, tagged 'receipts') ----
+    var rcForm = document.getElementById('rcEmailForm');
+    var rcInput = document.getElementById('rcEmailInput');
+    if (rcForm && rcInput) {
+      rcForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var email = (rcInput.value || '').trim();
+        var btn = rcForm.querySelector('button[type="submit"]');
+        var label = btn ? btn.innerHTML : '';
+        var oldErr = rcForm.querySelector('.rc-err');
+        if (oldErr) oldErr.remove();
+        if (btn) { btn.disabled = true; btn.textContent = 'sending…'; }
+        fetch('/api/subscribe', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, source: 'receipts' })
+        }).then(function (r) {
+          if (!r.ok) throw new Error('subscribe failed');
+        }).then(function () {
+          var safe = email.replace(/[<>&]/g, '');
+          rcForm.innerHTML =
+            '<div class="rc-done">you’re in. <span>now go shout about it.</span></div>' +
+            '<p class="rc-sent">we’ll be in touch at ' + safe + '.</p>';
+        }).catch(function () {
+          if (btn) { btn.disabled = false; btn.innerHTML = label; }
+          var msg = document.createElement('p');
+          msg.className = 'rc-err';
+          msg.textContent = 'that didn’t send — check your connection and try again.';
+          var row = rcForm.querySelector('.rc-row');
+          if (row) row.insertAdjacentElement('afterend', msg); else rcForm.appendChild(msg);
+        });
+      });
+    }
 
     // boot
     var q = new URLSearchParams(location.search).get('date');
