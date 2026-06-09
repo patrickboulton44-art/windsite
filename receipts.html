@@ -319,9 +319,7 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
 
         <aside class="rl-receipt" id="receiptCol" hidden>
           <div class="receipt-actions">
-            <button class="r-btn" id="dlBtn" type="button">⬇ download</button>
-            <button class="r-btn secondary" id="xBtn" type="button">share → X</button>
-            <button class="r-btn secondary" id="igBtn" type="button">share → instagram</button>
+            <button class="r-btn" id="dlBtn" type="button">⬇ download the receipt</button>
           </div>
           <p class="r-hint" id="rHint"></p>
           <div class="receipt-fit" id="receiptFit">
@@ -602,15 +600,6 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
       });
     }
     function fileName() { return 'lostinthewind-receipt-' + (currentDate || 'day') + '.png'; }
-    function totalText() {
-      var t = receiptWrap.querySelector('[data-role="total"]');
-      return t ? t.textContent : '';
-    }
-    function tweetText() {
-      return 'on ' + (currentDate ? shortDate(currentDate) : 'this day') + ', Britain paid ' + totalText() +
-        ' to switch off the wind and fire up gas to replace it — the bill lands on us. #lostinthewind';
-    }
-    function pageUrl() { return location.origin + '/receipts.html?date=' + (currentDate || today); }
     function downloadImage(done) {
       setHint('rendering…');
       makeBlob().then(function (blob) {
@@ -621,39 +610,8 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
         setHint(done || 'saved to your downloads.');
       }).catch(function () { setHint('couldn’t make the image — try again.'); });
     }
-    // does this device's share sheet accept image files? (true on most phones)
-    function supportsFileShare() {
-      try {
-        var f = new File([new Blob()], 'r.png', { type: 'image/png' });
-        return !!(navigator.share && navigator.canShare && navigator.canShare({ files: [f] }));
-      } catch (e) { return false; }
-    }
-    function shareFile() {
-      setHint('rendering…');
-      makeBlob().then(function (blob) {
-        var file = new File([blob], fileName(), { type: 'image/png' });
-        navigator.share({ files: [file], text: tweetText(), url: pageUrl() })
-          .then(function () { setHint(''); }).catch(function () { setHint(''); });
-      }).catch(function () { setHint('couldn’t make the image — try again.'); });
-    }
 
     document.getElementById('dlBtn').addEventListener('click', function () { downloadImage(); });
-
-    document.getElementById('xBtn').addEventListener('click', function () {
-      // always open X's tweet composer directly, synchronously inside the click
-      // (so it isn't popup-blocked and doesn't get lost behind an async share sheet),
-      // then render the image so it can be attached
-      var url = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(tweetText()) + '&url=' + encodeURIComponent(pageUrl());
-      var w = window.open(url, '_blank', 'noopener,noreferrer');
-      downloadImage(w ? 'tweet opened — attach the downloaded receipt image.'
-                      : 'allow pop-ups to open X — your receipt image has been saved to attach.');
-    });
-
-    document.getElementById('igBtn').addEventListener('click', function () {
-      if (supportsFileShare()) { shareFile(); return; }
-      // desktop: Instagram has no web upload — save the image to post manually
-      downloadImage('receipt saved — open Instagram and upload it.');
-    });
 
     // ---- email signup (→ Brevo via /api/subscribe, tagged 'receipts') ----
     var rcForm = document.getElementById('rcEmailForm');
