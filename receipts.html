@@ -214,38 +214,7 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
 .r-btn:disabled { opacity: 0.5; cursor: default; }
 .r-hint { font-size: 12px; color: rgba(0,0,0,0.58); text-align: center; min-height: 1.2em; max-width: 360px; line-height: 1.4; }
 
-/* ============================================================
-   Self-checkout intro overlay
-   ============================================================ */
-.checkout { position: fixed; inset: 0; z-index: 9999; background: #0c1311; color: #eaf3ef; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; cursor: pointer; transition: opacity .55s ease; }
-.checkout.done { opacity: 0; pointer-events: none; }
-.co-machine { width: min(440px, 100%); }
-.co-head { display: flex; align-items: center; gap: 10px; font-family: var(--font-body); font-weight: 700; font-size: 13px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(234,243,239,0.7); margin-bottom: 12px; }
-.co-head .dot { width: 9px; height: 9px; border-radius: 50%; background: #46d39a; box-shadow: 0 0 10px #46d39a; animation: co-blink 1.1s steps(2) infinite; }
-@keyframes co-blink { 50% { opacity: 0.25; } }
-.co-screen { background: linear-gradient(180deg,#0c2c22,#0a241c); border: 2px solid rgba(120,202,196,0.35); border-radius: 4px; padding: 26px 24px; }
-.co-due-label { font-family: var(--font-body); font-weight: 700; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(234,243,239,0.6); }
-.co-due { font-family: 'Outfit', system-ui, sans-serif; font-weight: 900; font-size: clamp(40px, 11vw, 60px); line-height: 1; letter-spacing: -0.02em; color: #fff; margin: 6px 0 4px; font-variant-numeric: tabular-nums; }
-.co-status { font-family: 'DM Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.08em; color: #46d39a; min-height: 1.2em; }
-.co-msg { font-family: var(--font-body); font-size: 12px; color: rgba(234,243,239,0.6); margin-top: 14px; }
-/* scan bed */
-.co-bed { margin-top: 18px; height: 92px; background: #11201b; border: 2px solid rgba(120,202,196,0.18); border-radius: 4px; position: relative; overflow: hidden; }
-.co-mini { position: absolute; top: 12px; left: -90px; width: 70px; height: 92px; background: #fbfaf6; border-radius: 2px 2px 0 0; padding: 7px 7px 0; box-shadow: 0 4px 10px rgba(0,0,0,0.4); animation: co-slide 2.6s cubic-bezier(.5,0,.5,1) infinite; }
-.co-mini i { display: block; height: 3px; background: rgba(0,0,0,0.55); margin-bottom: 4px; }
-.co-mini i:nth-child(1){ width: 70%; background: var(--lfg-orange-deep); height: 5px; }
-.co-mini i:nth-child(2){ width: 92%; }
-.co-mini i:nth-child(3){ width: 60%; }
-.co-mini i:nth-child(4){ width: 80%; }
-.co-mini i:nth-child(5){ width: 45%; }
-@keyframes co-slide { 0% { transform: translateX(0) rotate(-3deg); } 100% { transform: translateX(520px) rotate(-3deg); } }
-.co-laser { position: absolute; top: 0; bottom: 0; left: 50%; width: 3px; background: #ff3b30; box-shadow: 0 0 16px 3px rgba(255,59,48,0.8); animation: co-laser 1.1s ease-in-out infinite; }
-@keyframes co-laser { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
-.checkout.co-rang .co-bed { display: none; }
-.checkout.co-rang .co-screen { border-color: #46d39a; box-shadow: 0 0 0 3px rgba(70,211,154,0.25); }
-.co-skip { margin-top: 22px; font-family: var(--font-body); font-size: 12px; letter-spacing: 0.06em; color: rgba(234,243,239,0.4); text-transform: lowercase; }
-
 @media (prefers-reduced-motion: reduce) {
-  .co-mini, .co-laser, .co-head .dot { animation: none; }
   .nav-motif { transition: none; }
 }
 </style>
@@ -351,24 +320,6 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
     </div>
   </main>
 
-  <!-- self-checkout intro (once per visitor) -->
-  <div class="checkout" id="checkoutIntro" hidden aria-hidden="true">
-    <div class="co-machine">
-      <div class="co-head"><span class="dot"></span> self-checkout</div>
-      <div class="co-screen">
-        <div class="co-due-label">amount due</div>
-        <div class="co-due" id="coDue">£—</div>
-        <div class="co-status" id="coStatus">scanning…</div>
-        <div class="co-bed" id="coBed">
-          <div class="co-mini" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
-          <div class="co-laser"></div>
-        </div>
-        <div class="co-msg">switch off the wind · fire up the gas · added to your bill</div>
-      </div>
-    </div>
-    <p class="co-skip">tap anywhere to skip</p>
-  </div>
-
   <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.13/dist/html-to-image.js"></script>
   <script>
   (function () {
@@ -381,7 +332,6 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
     var receiptCol = document.getElementById('receiptCol');
     var receiptWrap = document.getElementById('receiptWrap');
     var rHint = document.getElementById('rHint');
-    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     var today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/London' });
     pick.max = today;
@@ -546,11 +496,10 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
         return r.ok ? r.json() : null;
       }).then(function (d) {
         if (current !== date) return;
-        if (!d || !d.farms) { statusEl.textContent = 'couldn’t reach the ledger — try again in a minute.'; checkoutFail(); return; }
+        if (!d || !d.farms) { statusEl.textContent = 'couldn’t reach the ledger — try again in a minute.'; return; }
         render(d);
-        checkoutReveal(d.switchOffCost + d.replaceCost);
       }).catch(function () {
-        if (current === date) { statusEl.textContent = 'couldn’t reach the ledger — try again in a minute.'; checkoutFail(); }
+        if (current === date) { statusEl.textContent = 'couldn’t reach the ledger — try again in a minute.'; }
       });
     }
 
@@ -625,52 +574,9 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
       downloadImage('receipt saved — open Instagram and upload it.');
     });
 
-    // ---- self-checkout intro ----
-    var INTRO_KEY = 'lftw_co_intro_seen';
-    var introActive = false, introDone = false, introStarted = false;
-    var coOverlay = document.getElementById('checkoutIntro');
-    function beep() {
-      try {
-        var AC = window.AudioContext || window.webkitAudioContext;
-        if (!AC) return;
-        var ctx = new AC();
-        var o = ctx.createOscillator(), g = ctx.createGain();
-        o.type = 'square'; o.frequency.value = 880;
-        g.gain.value = 0.05; o.connect(g); g.connect(ctx.destination);
-        o.start(); o.stop(ctx.currentTime + 0.09);
-      } catch (e) { /* audio may be blocked without a gesture — fine */ }
-    }
-    function startCheckout() {
-      if (introStarted) return;
-      if (reduceMotion) return;
-      try { if (localStorage.getItem(INTRO_KEY)) return; localStorage.setItem(INTRO_KEY, '1'); } catch (e) {}
-      introStarted = true; introActive = true;
-      coOverlay.hidden = false;
-      document.documentElement.style.overflow = 'hidden';
-      coOverlay.addEventListener('click', dismissCheckout);
-      setTimeout(function () { if (introActive) dismissCheckout(); }, 8000); // safety net
-    }
-    function checkoutReveal(total) {
-      if (!introActive) return;
-      document.getElementById('coDue').textContent = gbp(total);
-      document.getElementById('coStatus').textContent = '✓ total due — added to your bill';
-      coOverlay.classList.add('co-rang');
-      beep();
-      setTimeout(dismissCheckout, 1600);
-    }
-    function checkoutFail() { if (introActive) dismissCheckout(); }
-    function dismissCheckout() {
-      if (!introActive || introDone) return;
-      introDone = true; introActive = false;
-      coOverlay.classList.add('done');
-      document.documentElement.style.overflow = '';
-      setTimeout(function () { if (coOverlay.parentNode) coOverlay.parentNode.removeChild(coOverlay); }, 600);
-    }
-
     // boot
     var q = new URLSearchParams(location.search).get('date');
     var landing = (q && /^\d{4}-\d{2}-\d{2}$/.test(q) && q >= '2026-01-01' && q <= today) ? q : today;
-    startCheckout();
     load(landing);
   })();
   </script>
