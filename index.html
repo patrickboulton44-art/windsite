@@ -636,28 +636,36 @@ code, .mono {
   @keyframes ah-in { to { opacity: 1; transform: none; } }
   .ah-day { font-family: var(--font-body); font-weight: 700; font-size: 14px; color: rgba(0,0,0,0.7); }
   .ah-amt { font-family: var(--font-display); font-weight: 700; font-size: clamp(16px,2.2vw,20px); color: var(--lfg-black); font-variant-numeric: tabular-nums; white-space: nowrap; }
-  /* fades in a couple of seconds after the rows land */
-  .ah-cta {
-    display: inline-block; margin-top: 16px; opacity: 0;
-    font-family: var(--font-body); font-weight: 700; font-size: 14px;
-    color: var(--lfg-black); text-decoration: underline; text-underline-offset: 3px;
-    text-decoration-thickness: 2px;
+  /* the two doorway boxes above the email form */
+  .answer-ctas {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    margin: clamp(24px,4.5vh,38px) auto 0; width: 100%; max-width: 460px;
   }
-  .ah-cta span { display: inline-block; transition: transform .2s var(--ease,ease); }
-  .ah-cta:hover span { transform: translateX(4px); }
-  .with-history .ah-cta { animation: ah-in .6s var(--ease,ease) forwards; animation-delay: 1s; }
+  .cta-box {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    font-family: var(--font-body); font-weight: 700; font-size: clamp(13px,1.7vw,15px);
+    line-height: 1.25; text-align: center; text-decoration: none;
+    color: var(--lfg-black); background: transparent;
+    border: 2px solid var(--lfg-black); padding: 13px 10px; cursor: pointer;
+    transition: background .2s var(--ease,ease), color .2s var(--ease,ease);
+  }
+  .cta-box span { display: inline-block; transition: transform .2s var(--ease,ease); }
+  .cta-box:hover { background: var(--lfg-black); color: var(--lfg-cream); }
+  .cta-box:hover span { transform: translateX(4px); }
+  .cta-box:hover span.down { transform: translateY(3px); }
 
   /* mobile: slot the three-day panel between the verdict and the email form
      (panel keeps its fade/expand; the email keeps its reveal fade) */
   @media (max-width: 879px) {
     .answer-main { display: contents; }
     .answer-history { order: 1; }
-    .answer-main .ask { order: 2; }
+    .answer-main .answer-ctas { order: 2; }
+    .answer-main .ask { order: 3; }
     /* choreography: the big number lands large and zooms into place… */
     section.game.answered .a-real { animation: num-zoom .7s cubic-bezier(.2,.7,.3,1) both; }
-    /* …then the email form + three-day panel fade in together (on .with-history) */
-    .answer-main .ask { opacity: 0; transition: opacity .6s ease; }
-    .with-history .answer-main .ask { opacity: 1; }
+    /* …then the boxes, email form + three-day panel fade in together (on .with-history) */
+    .answer-main .ask, .answer-main .answer-ctas { opacity: 0; transition: opacity .6s ease; }
+    .with-history .answer-main .ask, .with-history .answer-main .answer-ctas { opacity: 1; }
   }
   @keyframes num-zoom { from { transform: scale(1.55); } to { transform: scale(1); } }
   @media (min-width: 880px) {
@@ -668,16 +676,17 @@ code, .mono {
     .with-history .answer-main .a-real { font-size: clamp(40px, 5vw, 76px); }
     .with-history .answer-main .a-guess,
     .with-history .answer-main .verdict { margin-left: 0; margin-right: auto; }
-    .with-history .answer-main .ask { margin-left: 0; }
+    .with-history .answer-main .ask,
+    .with-history .answer-main .answer-ctas { margin-left: 0; }
     .with-history .answer-history {
       flex: 0 0 clamp(300px, 26vw, 380px); max-height: none; margin-top: clamp(40px,4vw,56px);
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .answer-history, .with-history .ah-row, .with-history .ah-cta { transition: none; animation: none; }
-    .with-history .ah-row, .with-history .ah-cta { opacity: 1; transform: none; }
+    .answer-history, .with-history .ah-row { transition: none; animation: none; }
+    .with-history .ah-row { opacity: 1; transform: none; }
     section.game.answered .a-real { animation: none; }
-    .answer-main .ask { opacity: 1; }
+    .answer-main .ask, .answer-main .answer-ctas { opacity: 1; }
   }
 
   /* email capture on the answer screen (cream bg) */
@@ -1141,6 +1150,7 @@ code, .mono {
     <div class="wrap">
       <a class="wordmark" href="#">lostinthe<span class="tld">wind</span></a>
       <div class="nav-right">
+        <a class="nav-link" href="#why" id="navWhy">why is this happening?</a>
         <a class="nav-link" href="/receipts.html">the receipts</a>
         <a class="nav-motif" href="https://lookingforgrowth.uk" target="_blank" rel="noopener" aria-label="looking for growth — visit the main site"><span></span><span></span><span></span><span></span></a>
       </div>
@@ -1180,6 +1190,11 @@ code, .mono {
           <p class="a-sub">recent pace: <span id="meterRate">£47.56 a second</span> · updates every 15 minutes</p>
           <p class="verdict" id="verdict">not even close — we burns through cash faster than that.</p>
 
+          <div class="answer-ctas">
+            <a class="cta-box" href="/receipts.html">want to see the receipts? <span aria-hidden="true">→</span></a>
+            <button class="cta-box" id="continueBtn" type="button">why is this happening? <span class="down" aria-hidden="true">↓</span></button>
+          </div>
+
           <form class="ask" id="emailForm">
             <p class="ask-line">the bill keeps climbing until we make them fix the grid. <strong>we're the campaign forcing it. join us.</strong></p>
             <div class="ask-row">
@@ -1187,7 +1202,6 @@ code, .mono {
               <button type="submit">i'm in <span class="go" aria-hidden="true">→</span></button>
             </div>
             <p class="ask-privacy">campaign updates only — see our <a href="https://lookingforgrowth.uk/privacy-policy/" target="_blank" rel="noopener">privacy policy</a>.</p>
-            <button class="ask-skip" id="continueBtn" type="button">Why is this happening?</button>
           </form>
         </div>
         <aside class="answer-history" id="answerHistory" aria-hidden="true"></aside>
@@ -1218,7 +1232,7 @@ code, .mono {
   </section>
 
   <!-- EXPLAINER -->
-  <section class="explain" data-screen-label="explainer">
+  <section class="explain" id="why" data-screen-label="explainer">
     <div class="wrap">
       <div class="cliff cliff-lead">
         <div class="bigtype" id="costChart" role="img" aria-label="We're about to pay £8 billion a year to switch off the wind.">
@@ -1532,11 +1546,6 @@ window.LFG = window.LFG || {};
       row.appendChild(day); row.appendChild(amt);
       frag.appendChild(row);
     });
-    var cta = document.createElement('a');
-    cta.className = 'ah-cta';
-    cta.href = '/receipts.html';
-    cta.innerHTML = 'want to see the receipts? <span aria-hidden="true">→</span>';
-    frag.appendChild(cta);
     historyEl.textContent = '';
     historyEl.appendChild(frag);
   }
@@ -1627,6 +1636,20 @@ window.LFG = window.LFG || {};
   if (cont) cont.addEventListener('click', advance);
   // expose so the email signup can advance after a successful submit
   window.LFG.advance = advance;
+
+  // nav "why is this happening?" — skip past the game if needed, then go to the explainer
+  var navWhy = document.getElementById('navWhy');
+  if (navWhy) navWhy.addEventListener('click', function (e) {
+    e.preventDefault();
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var go = function () {
+      var t = document.getElementById('why');
+      if (t) t.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    };
+    if (advanced) { go(); return; }
+    advance();
+    setTimeout(go, reduce ? 50 : 600); // after the game has faded out and the content is shown
+  });
 
   // Lock scrolling until the user commits to a guess.
   document.documentElement.classList.add('locked');
