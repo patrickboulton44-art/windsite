@@ -430,6 +430,7 @@ code, .mono {
     font-family: var(--font-display); font-weight: 700;
     font-size: 19px; letter-spacing: -0.02em; text-transform: lowercase;
     color: var(--fg); text-decoration: none; line-height: 1;
+    white-space: nowrap;
   }
   .wordmark .tld { color: var(--lfg-orange); }
   .nav-right { display: flex; align-items: center; gap: clamp(16px, 3vw, 26px); }
@@ -437,8 +438,19 @@ code, .mono {
     font-family: var(--font-body); font-weight: 700; font-size: 14px;
     color: rgba(0,0,0,0.65); text-decoration: underline;
     text-decoration-color: var(--lfg-orange); text-underline-offset: 3px;
+    white-space: nowrap;
   }
   .nav-link:hover { color: var(--lfg-black); }
+  /* keep the bar on one tidy line as the screen narrows */
+  @media (max-width: 700px) {
+    .wordmark { font-size: 16px; }
+    .nav-link { font-size: 11px; }
+    .nav-right { gap: 12px; }
+    .nav-motif { width: 52px; }
+  }
+  @media (max-width: 460px) {
+    .nav-motif { display: none; }
+  }
   .nav-motif { display: flex; flex-direction: column; gap: 3px; width: 76px; }
   .nav-motif span { display: block; height: 4px; transform-origin: left center; }
   .nav-motif span:nth-child(1){ width: 72%; background: var(--lfg-yellow); }
@@ -642,17 +654,14 @@ code, .mono {
     margin: clamp(24px,4.5vh,38px) auto 0; width: 100%; max-width: 460px;
   }
   .cta-box {
-    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    display: inline-flex; align-items: center; justify-content: center;
     font-family: var(--font-body); font-weight: 700; font-size: clamp(13px,1.7vw,15px);
     line-height: 1.25; text-align: center; text-decoration: none;
-    color: var(--lfg-black); background: transparent;
+    color: var(--lfg-cream); background: var(--lfg-black);
     border: 2px solid var(--lfg-black); padding: 13px 10px; cursor: pointer;
     transition: background .2s var(--ease,ease), color .2s var(--ease,ease);
   }
-  .cta-box span { display: inline-block; transition: transform .2s var(--ease,ease); }
-  .cta-box:hover { background: var(--lfg-black); color: var(--lfg-cream); }
-  .cta-box:hover span { transform: translateX(4px); }
-  .cta-box:hover span.down { transform: translateY(3px); }
+  .cta-box:hover { background: transparent; color: var(--lfg-black); }
 
   /* mobile: slot the three-day panel between the verdict and the email form
      (panel keeps its fade/expand; the email keeps its reveal fade) */
@@ -1191,8 +1200,8 @@ code, .mono {
           <p class="verdict" id="verdict">not even close — we burns through cash faster than that.</p>
 
           <div class="answer-ctas">
-            <a class="cta-box" href="/receipts.html">want to see the receipts? <span aria-hidden="true">→</span></a>
-            <button class="cta-box" id="continueBtn" type="button">why is this happening? <span class="down" aria-hidden="true">↓</span></button>
+            <a class="cta-box" href="/receipts.html">want to see the receipts?</a>
+            <button class="cta-box" id="continueBtn" type="button">why is this happening?</button>
           </div>
 
           <form class="ask" id="emailForm">
