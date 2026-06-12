@@ -121,17 +121,16 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
 .sum-sub { font-weight: 500; font-size: 15px; color: rgba(0,0,0,0.65); margin-top: 12px; line-height: 1.55; max-width: 56ch; }
 .sum-sub strong { color: var(--lfg-black); }
 
-/* collapsible breakdown */
+/* "why is this happening?" — leads to the explainer on the main page */
 .reveal-toggle {
   display: inline-flex; align-items: center; gap: 9px; cursor: pointer;
   margin-top: clamp(22px, 4vw, 32px);
   font-family: var(--font-body); font-weight: 700; font-size: 15px;
   background: var(--lfg-black); color: var(--lfg-cream); border: 2px solid var(--lfg-black);
-  padding: 14px 22px; transition: background .2s var(--ease), color .2s var(--ease), border-color .2s var(--ease);
+  padding: 14px 22px; text-decoration: none;
+  transition: background .2s var(--ease), color .2s var(--ease), border-color .2s var(--ease);
 }
 .reveal-toggle:hover { background: var(--lfg-orange); border-color: var(--lfg-orange); color: var(--lfg-black); }
-.reveal-toggle span { transition: transform .2s var(--ease); }
-.reveal-toggle[aria-expanded="true"] span { transform: rotate(180deg); }
 
 /* email signup on the receipts page */
 .rc-signup { margin-top: clamp(22px, 4vw, 30px); max-width: 470px; background: var(--lfg-blue); padding: clamp(20px, 3.5vw, 28px); }
@@ -311,8 +310,7 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
         </form>
 
         <div class="rl-cards">
-          <button class="reveal-toggle" id="revealToggle" type="button" aria-expanded="false" hidden>see where your money went <span aria-hidden="true">↓</span></button>
-          <div id="content" hidden></div>
+          <a class="reveal-toggle" href="/#why">why is this happening?</a>
           <p class="worst" id="worst" hidden></p>
         </div>
         </div>
@@ -393,15 +391,7 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
     var prev = document.getElementById('prevBtn');
     var next = document.getElementById('nextBtn');
     var statusEl = document.getElementById('status');
-    var content = document.getElementById('content');
     var summaryEl = document.getElementById('summary');
-    var revealToggle = document.getElementById('revealToggle');
-    function setReveal(open) {
-      content.hidden = !open;
-      revealToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-      revealToggle.firstChild.textContent = open ? 'hide the breakdown ' : 'see where your money went ';
-    }
-    revealToggle.addEventListener('click', function () { setReveal(content.hidden); });
     var worstEl = document.getElementById('worst');
     var receiptCol = document.getElementById('receiptCol');
     var receiptWrap = document.getElementById('receiptWrap');
@@ -419,22 +409,6 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
     function shortDate(iso) {
       var d = new Date(iso + 'T12:00:00Z');
       return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' }).toLowerCase();
-    }
-    function periodTime(p) {
-      var mins = (p - 1) * 30;
-      var h = Math.floor(mins / 60), m = mins % 60;
-      return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
-    }
-    function spells(periods) {
-      var out = [], start = null, last = null;
-      periods.forEach(function (p) {
-        if (start === null) { start = p; last = p; return; }
-        if (p === last + 1) { last = p; return; }
-        out.push(periodTime(start) + '–' + periodTime(last + 1));
-        start = p; last = p;
-      });
-      if (start !== null) out.push(periodTime(start) + '–' + periodTime(last + 1));
-      return out;
     }
     function el(tag, cls, text) {
       var n = document.createElement(tag);
@@ -470,7 +444,6 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
 
     function render(d) {
       summaryEl.textContent = '';
-      content.textContent = '';
       statusEl.hidden = true;
       fillReceipt(d);
 
@@ -483,8 +456,6 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
         z.appendChild(el('span', '', 'it can be done.'));
         sum.appendChild(z);
         summaryEl.appendChild(sum);
-        revealToggle.hidden = true;
-        content.hidden = true;
       } else {
         var dayTotal = d.switchOffCost + d.replaceCost;
         var amountWrap = el('div', 'sum-amount');
@@ -496,53 +467,6 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
           gbp(d.replaceCost) + ' buying it back from gas and other generators.' + (d.isToday ? ' (so far today.)' : '');
         sum.appendChild(el('p', 'sum-sub', subBits));
         summaryEl.appendChild(sum);
-
-        function plantCard(f, stackType, detailText) {
-          var ledger = 'https://data.elexon.co.uk/bmrs/api/v1/balancing/settlement/stack/all/' + stackType + '/' + d.date + '/' + f.periods[0];
-          var card = el('div', 'farm');
-          var head = el('div', 'farm-head');
-          var nameWrap = el('div', 'farm-name', f.name.toLowerCase());
-          if (f.fuel) nameWrap.appendChild(el('span', 'fuel', f.fuel));
-          head.appendChild(nameWrap);
-          var costWrap = el('div', 'farm-cost');
-          var costLink = el('a', '', gbp(f.cost));
-          costLink.href = ledger; costLink.target = '_blank'; costLink.rel = 'noopener';
-          costLink.title = 'open the official Elexon record for this plant’s first half-hour';
-          costWrap.appendChild(costLink);
-          head.appendChild(costWrap);
-          card.appendChild(head);
-          card.appendChild(el('p', 'farm-detail', detailText));
-          var verify = el('p', 'farm-verify');
-          verify.appendChild(document.createTextNode('grid code ' + f.units.join(', ') + ' — '));
-          var va = el('a', '', 'check the official record for ' + periodTime(f.periods[0]) + ' →');
-          va.href = ledger; va.target = '_blank'; va.rel = 'noopener';
-          verify.appendChild(va);
-          card.appendChild(verify);
-          return card;
-        }
-
-        d.farms.forEach(function (f) {
-          var sp = spells(f.periods);
-          content.appendChild(plantCard(f, 'bid',
-            'paid to stop ' + (sp.length > 1 ? 'during ' : 'between ') + sp.join(', ') +
-            ' — ' + Math.round(f.mwh).toLocaleString('en-GB') + ' MWh of clean power not made.'));
-        });
-
-        if (d.replacements && d.replacements.length) {
-          var gapHead = el('div', 'gap-head');
-          gapHead.appendChild(el('p', 'sum-label', 'and who was paid to fill the gap'));
-          gapHead.appendChild(el('p', 'sum-sub',
-            'the same energy, bought twice: ' + gbp(d.replaceCost) + ' to these generators for the power the wind farms above were paid not to make.'));
-          content.appendChild(gapHead);
-          d.replacements.forEach(function (f) {
-            var sp = spells(f.periods);
-            content.appendChild(plantCard(f, 'offer',
-              'paid to turn up ' + (sp.length > 1 ? 'during ' : 'between ') + sp.join(', ') +
-              ' — ' + Math.round(f.mwh).toLocaleString('en-GB') + ' MWh of replacement power.'));
-          });
-        }
-        revealToggle.hidden = false;
-        setReveal(false); // start collapsed each day
       }
 
       if (d.worstDay && d.worstDay.date !== d.date) {
@@ -565,8 +489,6 @@ h1 { font-family: var(--font-display); font-weight: 700; text-transform: lowerca
       statusEl.hidden = false;
       statusEl.textContent = 'reading the ledger…';
       summaryEl.textContent = '';
-      content.textContent = '';
-      revealToggle.hidden = true;
       worstEl.hidden = true;
       history.replaceState(null, '', '?date=' + date);
       fetch('/api/receipts?date=' + date).then(function (r) {

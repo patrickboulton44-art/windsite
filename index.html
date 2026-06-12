@@ -441,16 +441,8 @@ code, .mono {
     white-space: nowrap;
   }
   .nav-link:hover { color: var(--lfg-black); }
-  /* keep the bar on one tidy line as the screen narrows */
-  @media (max-width: 700px) {
-    .wordmark { font-size: 16px; }
-    .nav-link { font-size: 11px; }
-    .nav-right { gap: 12px; }
-    .nav-motif { width: 52px; }
-  }
-  @media (max-width: 460px) {
-    .nav-motif { display: none; }
-  }
+  /* deep links to the explainer stop just below the sticky bar */
+  #why { scroll-margin-top: 72px; }
   .nav-motif { display: flex; flex-direction: column; gap: 3px; width: 76px; }
   .nav-motif span { display: block; height: 4px; transform-origin: left center; }
   .nav-motif span:nth-child(1){ width: 72%; background: var(--lfg-yellow); }
@@ -464,6 +456,18 @@ code, .mono {
   .nav-motif:hover span:nth-child(4){ animation-delay: .36s; }
   @keyframes eq-bounce { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(0.45); } }
   @media (prefers-reduced-motion: reduce) { .nav-motif:hover span { animation: none; } }
+  /* keep the bar on one tidy line as the screen narrows */
+  @media (max-width: 700px) {
+    .wordmark { font-size: 16px; }
+    .nav-link { font-size: 11px; }
+    .nav-right { gap: 12px; }
+    .nav-motif { width: 52px; }
+  }
+  @media (max-width: 460px) {
+    .nav-motif { display: none; }
+    .wordmark { font-size: 15px; }
+    .nav-link { font-size: 10px; }
+  }
 
   /* ---------------- HERO ---------------- */
   section.hero {
@@ -648,11 +652,14 @@ code, .mono {
   @keyframes ah-in { to { opacity: 1; transform: none; } }
   .ah-day { font-family: var(--font-body); font-weight: 700; font-size: 14px; color: rgba(0,0,0,0.7); }
   .ah-amt { font-family: var(--font-display); font-weight: 700; font-size: clamp(16px,2.2vw,20px); color: var(--lfg-black); font-variant-numeric: tabular-nums; white-space: nowrap; }
-  /* the two doorway boxes above the email form */
+  /* the two doorway boxes under the three-day panel — they slide in
+     just after the rows, with the same entrance */
   .answer-ctas {
     display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
-    margin: clamp(24px,4.5vh,38px) auto 0; width: 100%; max-width: 460px;
+    margin-top: 18px; width: 100%;
+    opacity: 0; transform: translateX(14px);
   }
+  .with-history .answer-ctas { animation: ah-in .5s var(--ease,ease) forwards; animation-delay: .46s; }
   .cta-box {
     display: inline-flex; align-items: center; justify-content: center;
     font-family: var(--font-body); font-weight: 700; font-size: clamp(13px,1.7vw,15px);
@@ -668,13 +675,12 @@ code, .mono {
   @media (max-width: 879px) {
     .answer-main { display: contents; }
     .answer-history { order: 1; }
-    .answer-main .answer-ctas { order: 2; }
-    .answer-main .ask { order: 3; }
+    .answer-main .ask { order: 2; }
     /* choreography: the big number lands large and zooms into place… */
     section.game.answered .a-real { animation: num-zoom .7s cubic-bezier(.2,.7,.3,1) both; }
-    /* …then the boxes, email form + three-day panel fade in together (on .with-history) */
-    .answer-main .ask, .answer-main .answer-ctas { opacity: 0; transition: opacity .6s ease; }
-    .with-history .answer-main .ask, .with-history .answer-main .answer-ctas { opacity: 1; }
+    /* …then the email form + three-day panel fade in together (on .with-history) */
+    .answer-main .ask { opacity: 0; transition: opacity .6s ease; }
+    .with-history .answer-main .ask { opacity: 1; }
   }
   @keyframes num-zoom { from { transform: scale(1.55); } to { transform: scale(1); } }
   @media (min-width: 880px) {
@@ -685,17 +691,16 @@ code, .mono {
     .with-history .answer-main .a-real { font-size: clamp(40px, 5vw, 76px); }
     .with-history .answer-main .a-guess,
     .with-history .answer-main .verdict { margin-left: 0; margin-right: auto; }
-    .with-history .answer-main .ask,
-    .with-history .answer-main .answer-ctas { margin-left: 0; }
+    .with-history .answer-main .ask { margin-left: 0; }
     .with-history .answer-history {
       flex: 0 0 clamp(300px, 26vw, 380px); max-height: none; margin-top: clamp(40px,4vw,56px);
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .answer-history, .with-history .ah-row { transition: none; animation: none; }
-    .with-history .ah-row { opacity: 1; transform: none; }
+    .answer-history, .with-history .ah-row, .with-history .answer-ctas { transition: none; animation: none; }
+    .with-history .ah-row, .with-history .answer-ctas { opacity: 1; transform: none; }
     section.game.answered .a-real { animation: none; }
-    .answer-main .ask, .answer-main .answer-ctas { opacity: 1; }
+    .answer-main .ask { opacity: 1; }
   }
 
   /* email capture on the answer screen (cream bg) */
@@ -1199,11 +1204,6 @@ code, .mono {
           <p class="a-sub">recent pace: <span id="meterRate">£47.56 a second</span> · updates every 15 minutes</p>
           <p class="verdict" id="verdict">not even close — we burns through cash faster than that.</p>
 
-          <div class="answer-ctas">
-            <a class="cta-box" href="/receipts.html">want to see the receipts?</a>
-            <button class="cta-box" id="continueBtn" type="button">why is this happening?</button>
-          </div>
-
           <form class="ask" id="emailForm">
             <p class="ask-line">the bill keeps climbing until we make them fix the grid. <strong>we're the campaign forcing it. join us.</strong></p>
             <div class="ask-row">
@@ -1213,7 +1213,13 @@ code, .mono {
             <p class="ask-privacy">campaign updates only — see our <a href="https://lookingforgrowth.uk/privacy-policy/" target="_blank" rel="noopener">privacy policy</a>.</p>
           </form>
         </div>
-        <aside class="answer-history" id="answerHistory" aria-hidden="true"></aside>
+        <aside class="answer-history" id="answerHistory">
+          <div id="historyRows"></div>
+          <div class="answer-ctas">
+            <a class="cta-box" href="/receipts.html">want to see the receipts?</a>
+            <button class="cta-box" id="continueBtn" type="button">why is this happening?</button>
+          </div>
+        </aside>
       </div>
 
       <p class="game-note"><em>live grid data from Elexon, the official record of Britain's electricity market.</em></p>
@@ -1528,7 +1534,7 @@ window.LFG = window.LFG || {};
 
   // ---- seven-day history panel: last 7 settled days, combined cost
   // (wind switch-off + replacement power), slides in beside the answer ----
-  var historyEl = document.getElementById('answerHistory');
+  var historyEl = document.getElementById('historyRows');
   var history7 = null;
   var wantHistory = false;
   function dayLabel(iso) {
@@ -1663,6 +1669,16 @@ window.LFG = window.LFG || {};
   // Lock scrolling until the user commits to a guess.
   document.documentElement.classList.add('locked');
   document.body.classList.add('locked');
+
+  // arriving at /#why (e.g. from the receipts page) — skip the game and
+  // land straight on the explainer
+  if (location.hash === '#why') {
+    advance();
+    setTimeout(function () {
+      var t = document.getElementById('why');
+      if (t) t.scrollIntoView({ behavior: 'auto', block: 'start' });
+    }, 520);
+  }
 })();
 </script>
 
@@ -1761,6 +1777,11 @@ window.LFG = window.LFG || {};
   // panel fades out. Click skips straight through.
   var intro = document.getElementById('intro');
   if (!intro) return;
+  // skip the gust entirely when deep-linking to the explainer
+  if (location.hash === '#why') {
+    if (intro.parentNode) intro.parentNode.removeChild(intro);
+    return;
+  }
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var finished = false;
   function finish() {
